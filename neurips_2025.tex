@@ -144,7 +144,7 @@ Although the SmokeViz dataset is anticipated to be primarily used for solving va
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\linewidth]{figures/variations2.png}
+    \includegraphics[width=\linewidth]{figures/variations_small.png}
     \caption{HMS smoke annotations overlaid on GOES imagery, the yellow, orange and red contours indicate the extent of light, medium and heavy density smoke. (a) and (b) show a canonical examples of a smoke plumes. (c)-(e) show observable variations in the density labels.}\label{densities}
 \end{figure}
 
@@ -157,7 +157,7 @@ To take into account movement characteristics to help identify smoke, analysts u
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\linewidth]{figures/TIMELAPSE_FINAL2.png}
+    \includegraphics[width=\linewidth]{figures/timelapse_small.png}
     \caption{True color GOES-East imagery from May 5th, 2022, Southeast New Mexico (\(31.38^{\circ}\)N, \(107.87^{\circ}\)W) during the start of the Foster Fire. The red, orange and yellow lines represent the heavy, medium and low density HMS smoke annotations that span 19:10\textendash23:00 UTC.}
     \label{timelapse}
 \end{figure}
@@ -168,7 +168,7 @@ As mentioned prior, rather than using one satellite or the cumulative data from 
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=8cm]{figures/mei.png}
+    \includegraphics[width=8cm]{figures/mei_small.png}
     \caption{If the particle size is \(<\frac{1}{10}\) the \(\lambda\) of the interacting light, then the primary scattering will be Rayleigh. Mie scattering is the predominant scattering mechanism when the particle size is larger than the \(\lambda\) of light. This schematic demonstrates that when the sun is setting in the West, the Mie scattering will predominately forward scatter towards GOES-East.} \label{mei}
 \end{figure}
 
@@ -176,7 +176,7 @@ For the existing dataset of HMS smoke plume annotations and all corresponding sa
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\linewidth]{figures/workflow.png}
+    \includegraphics[width=\linewidth]{figures/workflow_small.png}
     \caption{PLDR applied to create the SmokeViz dataset, the green boxes represent the dataset stages, note that the HMS analyst label \(y\) remains the same, the only change is for the satellite image(s) \(x\). (a) for a sample in the original full dataset \(\mathcal{D}\), each analyst annoation \(y_i\) corresponds to \(N\) satellite images that cover time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal{D}\) (b) using Mie scattering physics we find the satellite image, \(x_{(i,t_M)}\) that correlates with the time, \(t_M\), that would produce the highest possible SNR if smoke was present (c) the resulting \(\mathcal{D}_M\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_M)}, y_i) \in \mathcal{D}_M\) (d) use \(\mathcal{D}_M\) to train the parent model, \(f_\circ(x_{(i,t_M)})=y_i\) (e) apply a greedy algorithm \(f_\circ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image (f) use the intersection over union (IoU) metric to compare \(y^*\) to the analyst annotation, \(y_i\), and identify the time, \(t_p\), where the IPL and analyst annotation have the maximum IoU (g) use the time of highest overlap between \(y^*\) and \(y_i\) to identify the sample, \(x_{(i,t_p)}\), that should best match the analyst annotation (h) \(\mathcal{D}_p\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_p)}, y_i) \in \mathcal{D}_p\) (i) use the SmokeViz dataset \(\mathcal{D}_p\) to train deep learning models \(f_c(x_{(i,t_p)})=y_i\) to detect and classify the density of wildfire smoke plumes in GOES imagery.}\label{PLDR}
 \end{figure}
 
@@ -213,7 +213,7 @@ The Mie-derived image selection process accounts for atmospheric properties and 
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\linewidth]{figures/GOES_WEST_EAST_B_R_V.png}
+    \includegraphics[width=\linewidth]{figures/GOES_WEST_EAST_B_R_V_small.png}
     \caption{True color (a) GOES-WEST and (b) GOES-EAST imagery from March \(23^{rd}\), 2022 centered at (\(31.1^{\circ}\), \(-93.8^{\circ}\)) in Texas, USA taken at 23:20 UTC. The GOES-EAST raw band imagery for (c) blue, (d) red and (e) veggie bands show variations in the SNR for smoke detection in relation to the \(\lambda\) of light being measured.}\label{WEST_EAST_bands}
 \end{figure}
 
@@ -292,7 +292,7 @@ To interpret the performance of \(f_{\circ}\), we report the IoU metrics in tabl
 
 \begin{figure*}
     \centering
-    \includegraphics[width=\linewidth]{figures/final_results.png}
+    \includegraphics[width=\linewidth]{figures/final_results_small.png}
     \caption{GOES-West imagery showing smoke on June 8th, 2022 in Alaska where, at this geolocation (\(61.06^{\circ}\)N, \(156.12^{\circ}\)W), daylight was between 12:43-7:53 UTC. The HMS smoke annotations (top row) span from 18:50 to 23:50 UTC and are compared to the \(f_{\circ}\) generated pseudo-labels (bottom row). The first column (dotted outline) would be the GOES imagery selected for \(\mathcal{D}_{M}\) since it is closest to sunrise. The last column (solid outline) was selected for \(\mathcal{D}_{p}\) since it had the highest IoU value between the pseudo-label and analyst annotation. The IoU score over all densities is reported at the bottom of each column.}
     \label{ml_vs_mei}
 \end{figure*}
@@ -320,7 +320,7 @@ The results for the benchmarking models (table \ref{bench}) show similar perform
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=\linewidth]{figures/examples.png}
+    \includegraphics[width=\linewidth]{figures/examples_small.png}
     \caption{Examples of HMS annotations (top row) vs \(f_{c}\) output (bottom row) on \(\mathcal{D}_{p}\) samples. The overall IoU score is reported at the bottom of each column.}\label{examples}
 \end{figure}
 
