@@ -1,0 +1,121 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\bibstyle{abbrvnat}
+\citation{clean_air_act}
+\citation{smoke_PM}
+\citation{smoke_mortality}
+\citation{smoke_monitoring}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{goes}
+\citation{hrrr,rrfs}
+\citation{threshold}
+\citation{thresh_geog}
+\citation{hms,hms_val}
+\citation{hms_web}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Numerical}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Analyst}{2}{subsection.2.2}\protected@file@percent }
+\citation{smokenet}
+\citation{larsen}
+\citation{smoke_goes}
+\citation{smoke_goes,wildfire_detect,goes_conv,contrail}
+\citation{data_size}
+\citation{cifar}
+\citation{mnist}
+\citation{imgnet}
+\citation{smokenet}
+\citation{smoke_goes}
+\citation{larsen}
+\citation{satlas}
+\citation{pseudo}
+\citation{bigearthnet,crops}
+\citation{crops}
+\citation{polyworld}
+\citation{cyclone,cloud_texture}
+\citation{satlas}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Deep Learning}{3}{subsection.2.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparison of satellite smoke plume datasets detailing the number of samples containing smoke, observational satellite, number of bands/channels included, how the labels were generated and whether the labels are for image scene classification (SC) or semantic segmentation (SS)and if the dataset is publicly available.}}{3}{table.1}\protected@file@percent }
+\newlabel{studies}{{1}{3}{Comparison of satellite smoke plume datasets detailing the number of samples containing smoke, observational satellite, number of bands/channels included, how the labels were generated and whether the labels are for image scene classification (SC) or semantic segmentation (SS)and if the dataset is publicly available}{table.1}{}}
+\citation{satpy}
+\citation{true_color}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces HMS smoke annotations overlaid on GOES imagery, the yellow, orange and red contours indicate the extent of light, medium and heavy density smoke. (a) and (b) show a canonical examples of a smoke plumes. (c)-(e) show observable variations in the density labels.}}{4}{figure.1}\protected@file@percent }
+\newlabel{densities}{{1}{4}{HMS smoke annotations overlaid on GOES imagery, the yellow, orange and red contours indicate the extent of light, medium and heavy density smoke. (a) and (b) show a canonical examples of a smoke plumes. (c)-(e) show observable variations in the density labels}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Methods}{4}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Datasets}{4}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces True color GOES-East imagery from May 5th, 2022, Southeast New Mexico (\(31.38^{\circ }\)N, \(107.87^{\circ }\)W) during the start of the Foster Fire. The red, orange and yellow lines represent the heavy, medium and low density HMS smoke annotations that span 19:10\textendash 23:00 UTC.}}{4}{figure.2}\protected@file@percent }
+\newlabel{timelapse}{{2}{4}{True color GOES-East imagery from May 5th, 2022, Southeast New Mexico (\(31.38^{\circ }\)N, \(107.87^{\circ }\)W) during the start of the Foster Fire. The red, orange and yellow lines represent the heavy, medium and low density HMS smoke annotations that span 19:10\textendash 23:00 UTC}{figure.2}{}}
+\citation{zen_angle}
+\citation{semantic}
+\citation{efficientnetv2}
+\citation{pspnet}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces If the particle size is \(<\frac  {1}{10}\) the \(\lambda \) of the interacting light, then the primary scattering will be Rayleigh. Mie scattering is the predominant scattering mechanism when the particle size is larger than the \(\lambda \) of light. This schematic demonstrates that when the sun is setting in the West, the Mie scattering will predominately forward scatter towards GOES-East.}}{5}{figure.3}\protected@file@percent }
+\newlabel{mei}{{3}{5}{If the particle size is \(<\frac {1}{10}\) the \(\lambda \) of the interacting light, then the primary scattering will be Rayleigh. Mie scattering is the predominant scattering mechanism when the particle size is larger than the \(\lambda \) of light. This schematic demonstrates that when the sun is setting in the West, the Mie scattering will predominately forward scatter towards GOES-East}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Mie-Derived Dataset \(\mathcal  {D}_M\)}{5}{subsubsection.3.1.1}\protected@file@percent }
+\citation{conf_thresh}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces PLDR applied to create the SmokeViz dataset, the green boxes represent the dataset stages, note that the HMS analyst label \(y\) remains the same, the only change is for the satellite image(s) \(x\). (a) for a sample in the original full dataset \(\mathcal  {D}\), each analyst annoation \(y_i\) corresponds to \(N\) satellite images that cover time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal  {D}\) (b) using Mie scattering physics we find the satellite image, \(x_{(i,t_M)}\) that correlates with the time, \(t_M\), that would produce the highest possible SNR if smoke was present (c) the resulting \(\mathcal  {D}_M\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_M)}, y_i) \in \mathcal  {D}_M\) (d) use \(\mathcal  {D}_M\) to train the parent model, \(f_\circ (x_{(i,t_M)})=y_i\) (e) apply a greedy algorithm \(f_\circ ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image (f) use the intersection over union (IoU) metric to compare \(y^*\) to the analyst annotation, \(y_i\), and identify the time, \(t_p\), where the IPL and analyst annotation have the maximum IoU (g) use the time of highest overlap between \(y^*\) and \(y_i\) to identify the sample, \(x_{(i,t_p)}\), that should best match the analyst annotation (h) \(\mathcal  {D}_p\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_p)}, y_i) \in \mathcal  {D}_p\) (i) use the SmokeViz dataset \(\mathcal  {D}_p\) to train deep learning models \(f_c(x_{(i,t_p)})=y_i\) to detect and classify the density of wildfire smoke plumes in GOES imagery.}}{6}{figure.4}\protected@file@percent }
+\newlabel{PLDR}{{4}{6}{PLDR applied to create the SmokeViz dataset, the green boxes represent the dataset stages, note that the HMS analyst label \(y\) remains the same, the only change is for the satellite image(s) \(x\). (a) for a sample in the original full dataset \(\mathcal {D}\), each analyst annoation \(y_i\) corresponds to \(N\) satellite images that cover time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal {D}\) (b) using Mie scattering physics we find the satellite image, \(x_{(i,t_M)}\) that correlates with the time, \(t_M\), that would produce the highest possible SNR if smoke was present (c) the resulting \(\mathcal {D}_M\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_M)}, y_i) \in \mathcal {D}_M\) (d) use \(\mathcal {D}_M\) to train the parent model, \(f_\circ (x_{(i,t_M)})=y_i\) (e) apply a greedy algorithm \(f_\circ ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image (f) use the intersection over union (IoU) metric to compare \(y^*\) to the analyst annotation, \(y_i\), and identify the time, \(t_p\), where the IPL and analyst annotation have the maximum IoU (g) use the time of highest overlap between \(y^*\) and \(y_i\) to identify the sample, \(x_{(i,t_p)}\), that should best match the analyst annotation (h) \(\mathcal {D}_p\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_p)}, y_i) \in \mathcal {D}_p\) (i) use the SmokeViz dataset \(\mathcal {D}_p\) to train deep learning models \(f_c(x_{(i,t_p)})=y_i\) to detect and classify the density of wildfire smoke plumes in GOES imagery}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}PLDR Dataset \(\mathcal  {D}_p\)}{6}{subsubsection.3.1.2}\protected@file@percent }
+\citation{linknet}
+\citation{pspnet}
+\citation{manet}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces True color (a) GOES-WEST and (b) GOES-EAST imagery from March \(23^{rd}\), 2022 centered at (\(31.1^{\circ }\), \(-93.8^{\circ }\)) in Texas, USA taken at 23:20 UTC. The GOES-EAST raw band imagery for (c) blue, (d) red and (e) veggie bands show variations in the SNR for smoke detection in relation to the \(\lambda \) of light being measured.}}{7}{figure.5}\protected@file@percent }
+\newlabel{WEST_EAST_bands}{{5}{7}{True color (a) GOES-WEST and (b) GOES-EAST imagery from March \(23^{rd}\), 2022 centered at (\(31.1^{\circ }\), \(-93.8^{\circ }\)) in Texas, USA taken at 23:20 UTC. The GOES-EAST raw band imagery for (c) blue, (d) red and (e) veggie bands show variations in the SNR for smoke detection in relation to the \(\lambda \) of light being measured}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces A comparison of how smoke density would be represented by one-hot encoding commonly used for categorical data to thermometer encoding often used for ordinal data.}}{7}{table.2}\protected@file@percent }
+\newlabel{therm}{{2}{7}{A comparison of how smoke density would be represented by one-hot encoding commonly used for categorical data to thermometer encoding often used for ordinal data}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Dataset split for \(\mathcal  {D}_M\) and \(\mathcal  {D}_p\), samples for 2024 go up to November 1st \textcolor {purple}{do 2018-2022 instead}. We use an entire year of data for both validation and testing sets to capture year-long wildfire trends.}}{7}{table.3}\protected@file@percent }
+\newlabel{split}{{3}{7}{Dataset split for \(\mathcal {D}_M\) and \(\mathcal {D}_p\), samples for 2024 go up to November 1st \reynotes {do 2018-2022 instead}. We use an entire year of data for both validation and testing sets to capture year-long wildfire trends}{table.3}{}}
+\newlabel{overall_iou}{{1}{7}{PLDR Dataset \(\mathcal {D}_p\)}{equation.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Benchmark Models}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces IoU results per density of smoke and over all densities using \(f_{\circ }\) and \(f_c\) with \(\mathcal  {D}_M\) and \(\mathcal  {D}_p\).}}{8}{table.4}\protected@file@percent }
+\newlabel{iou_results}{{4}{8}{IoU results per density of smoke and over all densities using \(f_{\circ }\) and \(f_c\) with \(\mathcal {D}_M\) and \(\mathcal {D}_p\)}{table.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces GOES-West imagery showing smoke on June 8th, 2022 in Alaska where, at this geolocation (\(61.06^{\circ }\)N, \(156.12^{\circ }\)W), daylight was between 12:43-7:53 UTC. The HMS smoke annotations (top row) span from 18:50 to 23:50 UTC and are compared to the \(f_{\circ }\) generated pseudo-labels (bottom row). The first column (dotted outline) would be the GOES imagery selected for \(\mathcal  {D}_{M}\) since it is closest to sunrise. The last column (solid outline) was selected for \(\mathcal  {D}_{p}\) since it had the highest IoU value between the pseudo-label and analyst annotation. The IoU score over all densities is reported at the bottom of each column.}}{8}{figure.6}\protected@file@percent }
+\newlabel{ml_vs_mei}{{6}{8}{GOES-West imagery showing smoke on June 8th, 2022 in Alaska where, at this geolocation (\(61.06^{\circ }\)N, \(156.12^{\circ }\)W), daylight was between 12:43-7:53 UTC. The HMS smoke annotations (top row) span from 18:50 to 23:50 UTC and are compared to the \(f_{\circ }\) generated pseudo-labels (bottom row). The first column (dotted outline) would be the GOES imagery selected for \(\mathcal {D}_{M}\) since it is closest to sunrise. The last column (solid outline) was selected for \(\mathcal {D}_{p}\) since it had the highest IoU value between the pseudo-label and analyst annotation. The IoU score over all densities is reported at the bottom of each column}{figure.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{8}{section.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Comparison of semantic segmentation model IoU performance on \(\mathcal  {D}_{p}\).}}{9}{table.5}\protected@file@percent }
+\newlabel{bench}{{5}{9}{Comparison of semantic segmentation model IoU performance on \(\mathcal {D}_{p}\)}{table.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Examples of HMS annotations (top row) vs \(f_{c}\) output (bottom row) on \(\mathcal  {D}_{p}\) samples. The overall IoU score is reported at the bottom of each column.}}{9}{figure.7}\protected@file@percent }
+\newlabel{examples}{{7}{9}{Examples of HMS annotations (top row) vs \(f_{c}\) output (bottom row) on \(\mathcal {D}_{p}\) samples. The overall IoU score is reported at the bottom of each column}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Limitations}{9}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{9}{section.6}\protected@file@percent }
+\bibdata{references}
+\bibcite{rrfs}{{1}{2024}{{Ahmadov et~al.}}{{Ahmadov, Li, Romero-Alvarez, Schnell, Bhimireddy, James, Wong, Hu, Carley, Bhattacharjee, et~al.}}}
+\bibcite{clean_air_act}{{2}{2022}{{Aldy et~al.}}{{Aldy, Auffhammer, Cropper, Fraas, and Morgenstern}}}
+\bibcite{smoke_monitoring}{{3}{2016}{{Allison et~al.}}{{Allison, Johnston, Craig, and Jennings}}}
+\bibcite{smokenet}{{4}{2019}{{Ba et~al.}}{{Ba, Chen, Yuan, Song, and Lo}}}
+\bibcite{true_color}{{5}{2018}{{Bah et~al.}}{{Bah, Gunshor, and Schmit}}}
+\bibcite{satlas}{{6}{2023}{{Bastani et~al.}}{{Bastani, Wolters, Gupta, Ferdinando, and Kembhavi}}}
+\bibcite{smoke_PM}{{7}{2021}{{Burke et~al.}}{{Burke, Driscoll, Heft-Neal, Xue, Burney, and Wara}}}
+\bibcite{linknet}{{8}{2017}{{Chaurasia and Culurciello}}{{}}}
+\bibcite{imgnet}{{9}{2009}{{Deng et~al.}}{{Deng, Dong, Socher, Li, Li, and Fei-Fei}}}
+\bibcite{mnist}{{10}{2012}{{Deng}}{{}}}
+\bibcite{manet}{{11}{2020}{{Fan et~al.}}{{Fan, Wang, Li, and Wang}}}
+\bibcite{conf_thresh}{{12}{2023}{{Ferreira et~al.}}{{Ferreira, Lee, and D{\'o}rea}}}
+\bibcite{smoke_mortality}{{13}{2017}{{Gakidou et~al.}}{{Gakidou, Afshin, Abajobir, Abate, Abbafati, Abbas, Abd-Allah, Abdulle, Abera, Aboyans, et~al.}}}
+\bibcite{goes}{{14}{2019}{{Goodman et~al.}}{{Goodman, Schmit, Daniels, and Redmon}}}
+\bibcite{semantic}{{15}{2019}{{Iakubovskii}}{{}}}
+\bibcite{crops}{{16}{}{{Jakubik et~al.}}{{Jakubik, Roy, Phillips, Fraccaro, Godwin, Zadrozny, Szwarcman, Gomes, Nyirjesy, Edwards, et~al.}}}
+\bibcite{hrrr}{{17}{2018}{{James et~al.}}{{James, Ahmadov, and Grell}}}
+\bibcite{cyclone}{{18}{2024}{{Kitamoto et~al.}}{{Kitamoto, Hwang, Vuillod, Gautier, Tian, and Clanuwat}}}
+\bibcite{cifar}{{19}{2009}{{Krizhevsky et~al.}}{{Krizhevsky, Hinton, et~al.}}}
+\bibcite{larsen}{{20}{2021}{{Larsen et~al.}}{{Larsen, Hanigan, Reich, Qin, Cope, Morgan, and Rappold}}}
+\bibcite{pseudo}{{21}{2013}{{Lee}}{{}}}
+\bibcite{goes_conv}{{22}{2021}{{Lee et~al.}}{{Lee, Kummerow, and Ebert-Uphoff}}}
+\bibcite{hms}{{23}{2004}{{McNamara et~al.}}{{McNamara, Stephens, Ruminski, and Kasheta}}}
+\bibcite{contrail}{{24}{2023}{{Ng et~al.}}{{Ng, McCloskey, Cui, Meijer, Brand, Sarna, Goyal, Van~Arsdale, and Geraedts}}}
+\bibcite{hms_web}{{25}{}{{NOAA}}{{}}}
+\bibcite{wildfire_detect}{{26}{2019}{{Phan and Nguyen}}{{}}}
+\bibcite{thresh_geog}{{27}{1998}{{Randriambelo et~al.}}{{Randriambelo, Baldy, Bessafi, Petit, and Despinoy}}}
+\bibcite{satpy}{{28}{2018}{{Raspaud et~al.}}{{Raspaud, Hoese, Dybbroe, Lahtinen, Devasthale, Itkin, Hamann, Rasmussen, Nielsen, Leppelt, et~al.}}}
+\bibcite{zen_angle}{{29}{1985}{{Royer et~al.}}{{Royer, Vincent, and Bonn}}}
+\bibcite{hms_val}{{30}{2008}{{Schroeder et~al.}}{{Schroeder, Ruminski, Csiszar, Giglio, Prins, Schmidt, and Morisette}}}
+\bibcite{cloud_texture}{{31}{2020}{{Stevens et~al.}}{{Stevens, Bony, Brogniez, Hentgen, Hohenegger, Kiemle, L'Ecuyer, Naumann, Schulz, Siebesma, et~al.}}}
+\bibcite{bigearthnet}{{32}{2019}{{Sumbul et~al.}}{{Sumbul, Charfuelan, Demir, and Markl}}}
+\bibcite{data_size}{{33}{2017}{{Sun et~al.}}{{Sun, Shrivastava, Singh, and Gupta}}}
+\bibcite{efficientnetv2}{{34}{2021}{{Tan and Le}}{{}}}
+\bibcite{smoke_goes}{{35}{2021}{{Wen and Burke}}{{}}}
+\bibcite{pspnet}{{36}{2017}{{Zhao et~al.}}{{Zhao, Shi, Qi, Wang, and Jia}}}
+\bibcite{threshold}{{37}{2010}{{Zhao et~al.}}{{Zhao, Ackerman, and Guo}}}
+\bibcite{polyworld}{{38}{2022}{{Zorzi et~al.}}{{Zorzi, Bazrafkan, Habenschuss, and Fraundorfer}}}
+\gdef \@abspage@last{12}
