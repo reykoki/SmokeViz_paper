@@ -161,7 +161,7 @@ While SmokeViz is designed to support wildfire smoke detection and segmentation,
 \subsection{Datasets}
 
 
-We use imagery from the latest GOES satellites, GOES-16 (East), GOES-17 and GOES-18 (West), each equipped with the ABI, which captures 16 spectral bands from visible to infrared wavelengths (\(\lambda\)s) every 10 minutes. We process bands 1-3 using PyTroll \cite{satpy} to generate 1km true-color composites \cite{true_color}, matching the composite viewed by HMS analysts. These bands correspond to the shortest \(\lambda\)s available on ABI and yield the highest signal-to-noise ratio (SNR).
+We use imagery from the latest GOES satellites, GOES-16 (East), GOES-17 and GOES-18 (West), each equipped with the ABI, which captures 16 spectral bands from visible to infrared wavelengths (\(\lambda\)s) every 10 minutes. We process bands 1-3 using \texttt{PyTroll} \cite{satpy} to generate 1km true-color composites \cite{true_color}, matching the composite viewed by HMS analysts. These bands correspond to the shortest \(\lambda\)s available on ABI and yield the highest signal-to-noise ratio (SNR).
 
 To leverage movement characteristics of smoke, HMS analysts use multi-frame animations of the satellite imagery. The time windows are defined by  approximate number of frames the analyst views smoke, often with buffers before the fire starts. Annotations span varying time windows, often covering multiple hours, averaging three hours per annotation. Since the HMS annotations are designed to reflect overall plume extent during a time window rather than at any specific moment, smoke boundaries in individual frames may not align well with the annotation (Figure \ref{timelapse}). A naive modeling approach would use all frames within each time window as input, but this introduces non-uniform sequence lengths and significantly increases memory and computational demands, which complicates the use of deep learning architectures and model usage in real-time operations. Instead, we establish a one-to-one mapping by identifying the single satellite frame that best matches each analyst annotation.
 
@@ -193,7 +193,21 @@ For the existing dataset of HMS smoke plume annotations and all corresponding sa
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{figures/workflow_small.png}
-    \caption{PLDR applied to create the SmokeViz dataset, the green boxes represent the dataset stages, note that the HMS analyst label \(y\) remains the same, the only change is for the satellite image(s) \(x\). (a) for a sample in the original full dataset \(\mathcal{D}\), each analyst annotation \(y_i\) corresponds to \(N\) satellite images that cover time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal{D}\) (b) using Mie scattering physics we find the satellite image, \(x_{(i,t_M)}\) that correlates with the time, \(t_M\), that would produce the highest possible SNR if smoke was present (c) the resulting \(\mathcal{D}_M\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_M)}, y_i) \in \mathcal{D}_M\) (d) use \(\mathcal{D}_M\) to train the parent model, \(f_\circ(x_{(i,t_M)})=y_i\) (e) apply a greedy algorithm \(f_\circ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image (f) use the intersection over union (IoU) metric to compare \(y^*\) to the analyst annotation, \(y_i\), and identify the time, \(t_p\), where the IPL and analyst annotation have the maximum IoU (g) use the time of highest overlap between \(y^*\) and \(y_i\) to identify the sample, \(x_{(i,t_p)}\), that should best match the analyst annotation (h) \(\mathcal{D}_p\) has a one-to-one ratio of image-to-annotation \((x_{(i,t_p)}, y_i) \in \mathcal{D}_p\) (i) use the SmokeViz dataset \(\mathcal{D}_p\) to train deep learning models \(f_c(x_{(i,t_p)})=y_i\) to detect and classify the density of wildfire smoke plumes in GOES imagery.}\label{PLDR}
+    \caption{
+        PLDR applied to create the SmokeViz dataset. Green boxes indicate dataset stages. 
+        (a) For original dataset \(\mathcal{D}\) - analyst annotation \(y_i\) corresponds to \(N\) satellite images across time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal{D}\); 
+        (b) use Mie scattering to find the time, \(t_M\), that corresponds with satellite image \(x_{(i,t_M)}\) that would produce the highest possible SNR if smoke was present; 
+        (c) resulting \(\mathcal{D}_M\) is one-to-one \((x_{(i,t_M)}, y_i) \in \mathcal{D}_M\);
+        (d) parent model \(f_\circ\) is trained; 
+        (d) parent model \(f_\circ\) is trained on \(\mathcal{D}_M\) such that \(f_\circ(x_{(i,t_M)})=y_i\);
+        (e) apply a greedy algorithm \(f_\circ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image; 
+        (f) compute the intersection over union (IoU) between \(y^*\) and \(y_i\) to identify the time \(t_p\) where the IPL and analyst annotation have the maximum IoU; 
+        (g) best match image \(x_{(i,t_p)}\) selected; 
+        (g) match \(t_p\) to its correpsonding image \(x_{(i,t_p)}\) that should best match the analyst annotation;
+        (h) SmokeViz dataset \(\mathcal{D}_p\) created; 
+        (i) child model \(f_c\) is trained on \(\mathcal{D}_p\) such that \(f_c(x_{(i,t_p)})=y_i\) is used to detect and classify the density of wildfire smoke plumes in GOES imagery.
+    }
+\label{PLDR}
 \end{figure}
 
 To train an initial parent model, \(f_{\circ}\), we developed a method of leveraging Mie scattering physics to select \(x_{(i,t_M)} \in \mathcal{X}\) (Figure \ref{PLDR}(b)) so that \(x_{(i,t_M)}\) has a higher chance than random selection out of the set of imagery \([x_{(i,t_0)},...,x_{(i,t_N)}]\) to be representative of \(y_i\). This Mie-Derived Dataset, \(\mathcal{D}_M\) produces a training set so that if there is smoke present during the entire time window, the selected timestamp \(t_M\) would give the highest smoke SNR. 
@@ -210,10 +224,6 @@ Let \(\mathcal{D} = \{\mathcal{X}, \mathcal{Y}\}\) be the original dataset, wher
 Based on forward scattering criteria, the trivial strategy would be to pull imagery from GOES-West right after sunrise and from GOES-East right before sunset when the SZA is closest to \(90^{\circ}\). However, the time when the SZA approaches \(90^{\circ}\) coincides with when there are maximized atmospheric interactions that cause an increase in noise and artifacts \cite{zen_angle}. To avoid image artifacts caused by extreme SZA, we exclude scenes with SZA \(>88^\circ\) if there are lower SZA images available. The resulting dataset \(\mathcal{D}_M\) contains over 200,000 samples and is used to train the parent model \(f_{\circ}\).
 
 \subsubsection{PLDR Dataset \(\mathcal{D}_p\)} 
-
-To build the deep learning architecture for \(f_o\) we use the high level API package Segmentation Models Pytorch \cite{semantic} to implement EfficientNetV2 \cite{efficientnetv2} as the encoder with random initialized weights connected to the semantic segmentation classifier from the PSPNet model \cite{pspnet}. The data input is 256x256x3 snapshots of 1km resolution true color GOES imagery that contain smoke and output a 256x256x3 classification map that predicts if a pixel contains smoke and if so, what the categorical density of that smoke is. Since the smoke density labels are ordinal, we apply the thermometer encoding shown in table \ref{therm} to encode the smoke densities and apply binary cross entropy as the loss function per density of smoke. 
-
-
 
 \begin{table}
 \parbox{.45\linewidth}{
@@ -246,20 +256,20 @@ To build the deep learning architecture for \(f_o\) we use the high level API pa
 }
 \end{table}
 
-To determine which image out of the relevant imagery for the given time window best represents the analyst annotation, we implement a greedy algorithm (Figure \ref{PLDR}(e)) \(f_\circ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\). The outputs of \(f_{\circ}\), \([y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) give \(N\) predictions on the location and density of smoke in the imagery over the analyst defined time window \(t\). Each \(y^*\) serve as a semantic segmentation IPL of smoke and are compared to the corresponding analyst annotation, \(y_i\). To compare each \(y^*\) to \(y_i\) (Figure ref{PLDR}(f)), we calculate the intersection over union (IoU) using the total set of pixels for \(y^*\) at that density of smoke and the entire set of pixels for \(y_i\) for a particular smoke density in each image as shown in equation \ref{overall_iou}. The timestamp, \(t_p\) associated with the IPL with the highest IoU score, \(y^*_{(i,t_p)}\) is matched to the corresponding image, \(x_{(i,t_p)}\) (Figure \ref{PLDR}(g)), that is predicted to best represent the analyst smoke annotation, \(y_i\). A standard implementation detail for PLs \cite{conf_thresh}, a confidence threshold value is defined to determine if the corresponding sample (\(x_{(i, t_p)}, y_i\)) should to be included in the dataset \(\mathcal{D}_p\). Based on subjective visual inspection by the authors of when the satellite imagery became consistently unidentifiable to its label, we chose a confidence threshold that would include the sample in \(\mathcal{D}_{p}\) if the maximum overall IoU was over 0.01. 
-\reynotes{say size}
+
+We train \(f_{\circ}\) on \(\mathcal{D}_M\) (table \ref{split}) to find smoke in GOES imagery. The model is then applied across each satellite image within the time window \([x_{(i,t_0)},...,x_{(i,t_N)}]\) to produce intermediary pseudo-labels (IPLs), \([y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\). We compute the intersection over union (IoU) between each \(y^*\) and the corresponding analyst label \(y_i\), selecting the timestamp \(t_p\) that yields the maximum IoU to define \(\mathcal{D}_p = \{x_{(i,t_p)}, y_i\}\).
 
 \begin{equation} \label{overall_iou}
     IoU_{\text{overall}} = \frac{\sum\limits_{j=\text{light}}^{\text{heavy}}|y_{j}\cap y^*_{j}|}{\sum\limits_{j=\text{light}}^{\text{heavy}}|y_{j}|\cup|y^*_{j}|}
 \end{equation}
 
+To build \(f_{\circ}\), we implement \texttt{Segmentation Models PyTorch} \cite{semantic} with EfficientNetV2 \cite{efficientnetv2} as the encoder and PSPNet \cite{pspnet} as the decoder. Input images are \(256\times256\times3\) true-color snapshots; the output is a \(256\times256\times3\) classification map predicting categorical smoke density. We use thermometer encoding to capture the ordinal nature of smoke density classes (Table \ref{therm}) and apply binary cross-entropy loss across the classes. We use a confidence threshold of IoU  >0.01 \cite{conf_thresh} to exclude samples with negligible overlap. 
 
-
-The same dataset split choices and model training setup that were used for \(\mathcal{D}_{M}\) and \(f_{\circ}\) were implemented for \(\mathcal{D}_p\) and \(f_c\). As depicted in Figure \ref{PLDR}(e), we use \(\mathcal{D}_{p}\) to train a child model \(f_c\). To assess if training with \(\mathcal{D}_{p}\) can produce a more robust semantic segmentation model compared to training on \(\mathcal{D}_M\) we run \(f_c\) on the \(\mathcal{D}_{p}\) and \(\mathcal{D}_{M}\) test sets. 
+The same dataset split choices (table \ref{split}) and model setup that were used for \(\mathcal{D}_{M}\) and \(f_{\circ}\) were implemented for to train a child model \(f_c\) on \(\mathcal{D}_p\). To assess if training with \(\mathcal{D}_{p}\) can produce a more robust semantic segmentation model compared to training on \(\mathcal{D}_M\) we run \(f_c\) on the \(\mathcal{D}_{p}\) and \(\mathcal{D}_{M}\) test sets. 
 
 \subsection{Benchmark Models}
 
-We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) by varying the semantic segmentation classification heads. We train Linknet \cite{linknet}, PSPNet \cite{pspnet} and MANet \cite{manet} using the same encoder for \(f_c\) and \(f_{\circ}\), EfficientNetV2. Each model is trained over 100 epochs using a batch size of 32 and the Adam optimizer on 8 Nvidia P100 GPUs allocating 100GB of memory over 12 hours of allotted training time. We choose these architectures because of their abilities to capture multi-scale objects such the varying spatial extents of smoke plumes.
+We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) by varying the semantic segmentation architectures. We train Linknet \cite{linknet}, PSPNet \cite{pspnet} and MANet \cite{manet} using the same encoder for \(f_c\) and \(f_{\circ}\), EfficientNetV2. Each model is trained over 100 epochs using a batch size of 32 and the Adam optimizer on 8 16GB memory Nvidia P100 GPUs over 12 hours of allotted training time. We choose these architectures because of their abilities to capture multi-scale objects such the varying spatial extents of smoke plumes.
 
 \section{Results}
 
