@@ -98,7 +98,7 @@
 
 Due in part to public policy, average fine particulate matter (PM\textsubscript{2.5}) levels in the United States have declined over recent decades \cite{clean_air_act}. However, from 2010 to 2020, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations more than doubled, accounting for up to half of total PM\textsubscript{2.5} exposure in Western U.S. \cite{smoke_PM}. This is particularly concerning, as ambient PM\textsubscript{2.5} is a leading environmental risk factor for adverse health outcomes and premature mortality \cite{smoke_mortality}. These trends/risks highlight the urgent need for scalable and timely smoke monitoring systems to mitigate public health risks.
 
-Satellite imagery offers the spatial coverage and temporal frequency needed for large-scale smoke monitoring. In comparison to polar-orbiting satellites like Suomi or Sentinel, Geostationary satellites such as the GOES series \cite{goes} are especially well-suited to this task, providing persistent observation over fixed regions—essential for capturing the dynamic behavior of wildfire smoke plumes. The high temporal resolution and wide coverage of GOES imagery enable real-time tracking of smoke concentration and movement, supporting air quality assessments and early warning systems.
+Satellite imagery offers the spatial coverage and temporal frequency needed for large-scale smoke monitoring. In comparison to polar-orbiting satellites like Suomi or Sentinel, geostationary satellites such as the GOES series \cite{goes} are especially well-suited to this task, providing persistent observation over fixed regions—essential for capturing the dynamic behavior of wildfire smoke plumes. The high temporal resolution and wide coverage of GOES imagery enable real-time tracking of smoke concentration and movement, supporting air quality assessments and early warning systems.
 
 Even with the advances in remote sensing, existing deep learning satellite datasets for wildfire smoke detection face several limitations. They are often small in scale, restricted to specific regions or events, and focus on scene-level classification rather than pixel-level segmentation. Most do not differentiate between smoke density levels, are not publicly available, and lack standardized benchmarks for semantic segmentation. While NOAA’s Hazard Mapping System (HMS) provides a large-scale, expert-labeled dataset, its annotations span multi-hour time windows that vary in duration. This creates a temporal mismatch between the labels and individual satellite frames, complicating their direct use for supervised learning.
 
@@ -133,41 +133,44 @@ Manual smoke labeling is performed by trained analysts through visual inspection
 
 Recent efforts have applied deep learning to wildfire smoke detection using a variety of satellite sources and label strategies. SmokeNet \cite{smokenet} employs a convolutional neural network (CNN) to classify MODIS image scenes as containing smoke or not, using student-provided labels. SatlasPretrain \cite{satlas} includes a small set of Sentinel-2 images labeled for smoke as part of a larger multi-label pretraining dataset. While scene classification methods can provide wildfire detection information, they do not capture spatial characteristics of smoke plumes that segmentation would be more appropiate to capture.
 
-Several datasets have been developed for smoke segmentation, but they are limited in scope. Wen et al.\ \cite{smoke_goes} trained a CNN on GOES-East imagery over California and Nevada using HMS annotations from the 2018 wildfire season. Larsen et al.\ \cite{larsen} used Himawari-8 data to detect smoke at the pixel level for a single fire event, using a threshold-based algorithm as ground truth. Table~\ref{studies} compares these datasets in terms of scale, source, and labeling. SmokeViz stands out by offering over 180,000 samples with analyst-generated, frame-aligned labels covering multiple fire seasons, regions, and biogeographies. It is, to our knowledge, the largest and most diverse dataset for smoke plume segmentation.
+Several datasets have been developed for smoke segmentation, but they are limited in scope. Wen et al.\ \cite{smoke_goes} trained a CNN on GOES-East imagery over California and Nevada using HMS annotations from the 2018 wildfire season. Larsen et al.\ \cite{larsen} used Himawari-8 data to detect smoke at the pixel level for a single fire event, using a threshold-based algorithm as ground truth. Table~\ref{studies} compares these datasets in terms of scale, source, and labeling. SmokeViz stands out by offering over 180,000 samples with analyst-generated, frame-aligned labels covering multiple fire seasons, regions, and biogeographies. Not only do we use geostationary satellites with persistent observations, but we choose either GOES-East or GOES-West based on which satellite has optimal observational conditions of the event. It is, to our knowledge, the largest and most diverse dataset for smoke plume segmentation.
 
 
 \begin{table*}[h]
-    \caption{Comparison of satellite smoke plume datasets, detailing the number of smoke plume samples, satellite source, number of spectral bands, labeling method, classification type - scene classification (SC) or semantic segmentation (SS), and public availability.}\label{studies}
+    \caption{Comparison of satellite smoke plume datasets, detailing the number of smoke plume samples, satellite source (polar orbiting (P) or geostationary (G)), number of spectral bands, labeling method, classification type - scene classification (SC) or semantic segmentation (SS), and public availability.}\label{studies}
     \centering
     \begin{tabular}{ccccrrcrc}
         \toprule
         reference & \verb|#| samples & satellite & \verb|#| bands & label & task & avail.\\
         \midrule
-        \cite{smokenet}& 1016 & MODIS & 5 & students & SC & no \\
-        \cite{satlas} & 125 & Sentinel-2 & 3 & crowd sourced & SC & yes \\
-        \cite{smoke_goes}& 4095 & GOES-East & 5 & HMS analysts & SS & no \\
-        \cite{larsen} & 975 & Himiwari-8 & 7 & algorithm& SS & no \\
+        \cite{smokenet}& 1016 & MODIS (P)& 5 & students & SC & no \\
+        \cite{satlas} & 125 & Sentinel-2 (P)& 3 & crowd sourced & SC & yes \\
+        \cite{smoke_goes}& 4095 & GOES-East (G)& 5 & HMS analysts & SS & no \\
+        \cite{larsen} & 975 & Himiwari-8 (G) & 7 & algorithm& SS & no \\
         %\cite{wang}& 47 & Landsat-8 & 4 & & \\
-        SmokeViz  & 183,672 & GOES-East/West & 3 & HMS analysts & SS & yes \\
+        SmokeViz  & 183,672 & GOES-East+West (G)& 3 & HMS analysts & SS & yes \\
         \bottomrule
     \end{tabular}
 \end{table*}
 
 In addition to its relevance for wildfire applications, SmokeViz contributes a challenging benchmark for general-purpose remote sensing vision tasks. Unlike many existing datasets that avoid cloudy scenes \cite{bigearthnet, crops} or focus on sharply bounded features such as cropland \cite{crops}, infrastructure \cite{polyworld}, or oceanic clouds \cite{cyclone, cloud_texture}, smoke has amorphous, fading boundaries in both space and time. Incorporating smoke segmentation into large-scale pretraining corpora, such as SatlasPretrain \cite{satlas}, could enhance generalizable models for Earth observation.
 
-\subsection{Pseudo-labeling}
+\subsection{Pseudo-labeling and Semi-Supervised Learning}
 
 Semi-supervised learning techniques such as pseudo-labeling have been widely used to expand training data by leveraging unlabeled samples \cite{pseudo}. Typically, a parent model is trained on labeled data and then used to generate pseudo-labels for an unlabeled dataset, which are in turn used to train subsequent models in an iterative process.
 
 In contrast, we propose a non-iterative variation focused not on data expansion, but dataset data-to-label precision. Our method, \textbf{pseudo-label dimension reduction (PLDR)}, generates intermediary pseudo-labels (IPLs) for each satellite frame within the HMS annotation window. Rather than using these labels for training, we use them to identify the satellite image with the greatest alignment to the analyst annotation. This enables the construction of SmokeViz, a temporally disambiguated, one-to-one image-to-label dataset. The resulting dataset methodically pairs the analyst-generated smoke plume labels with selected GOES imagery, enabling high-resolution, temporally accurate segmentation model training.
 
 
+Beyond wildfire smoke segmentation, PLDR offers a general framework for aligning coarse or weakly matched datasets. This is particularly useful in domains such as remote sensing, medical imaging, and video analysis, where annotations often span temporal or spatial intervals rather than individual frames. In Earth observation specifically, atmospheric parameters are often combined from disparate sources with inconsistent spatial and temporal resolutions, making it difficult to integrate them into unified training datasets. By using intermediary pseudo-labels to identify the most representative input sample, PLDR transforms many-to-one or one-to-many supervision into clean one-to-one mappings. This enables more precise alignment between data and labels, facilitating integration across heterogeneous sources without requiring new human annotations. As such, PLDR serves as a practical preprocessing strategy for repurposing legacy datasets with temporal ambiguity into precise training resources for modern deep learning models.
+
 \section{Methods}
 \subsection{Datasets}
 
-We use imagery from the latest GOES satellites, GOES-16 (East), GOES-17 and GOES-18 (West), each equipped with the ABI, which captures 16 spectral bands from visible to infrared wavelengths (\(\lambda\)s) every 10 minutes. We process bands 1-3 using \texttt{PyTroll} \cite{satpy} to generate 1km true-color composites \cite{true_color}, matching the composite viewed by HMS analysts. These bands correspond to the shortest \(\lambda\)s available on ABI and yield the highest signal-to-noise ratio (SNR).
+We use imagery from the latest GOES satellites—GOES-16 (East), GOES-17, and GOES-18 (West)—each equipped with the Advanced Baseline Imager (ABI), which captures 16 spectral bands from visible to infrared wavelengths every 10 minutes. We process bands 1--3 using PyTroll \cite{satpy} to generate 1~km true-color composites \cite{true_color}, matching the imagery reviewed by HMS analysts. These bands correspond to the shortest wavelengths available on ABI and yield the highest signal-to-noise ratio (SNR).
 
-To leverage movement characteristics of smoke, HMS analysts use multi-frame animations of the satellite imagery. The time windows are defined by  approximate number of frames the analyst views smoke, often with buffers before the fire starts. Annotations span varying time windows, often covering multiple hours, averaging three hours per annotation. Since the HMS annotations are designed to reflect overall plume extent during a time window rather than at any specific moment, smoke boundaries in individual frames may not align well with the annotation (Figure \ref{timelapse}). A naive modeling approach would use all frames within each time window as input, but this introduces non-uniform sequence lengths and significantly increases memory and computational demands, which complicates the use of deep learning architectures and model usage in real-time operations. Instead, we establish a one-to-one mapping by identifying the single satellite frame that best matches each analyst annotation.
+To approximate the dynamic movement of smoke, HMS analysts annotate plumes using multi-frame satellite animations. These annotations span varying time windows, averaging three hours. Since the HMS annotations are designed to reflect overall plume extent during a time window rather than at any specific moment, smoke boundaries in individual frames may not align well with the annotation (Figure~\ref{timelapse}). A naive modeling approach would use all frames within each time window as input, but this introduces non-uniform sequence lengths and significantly increases memory and computational demands and complicates the use of CNN architectures. Instead, we establish a one-to-one mapping by identifying the single satellite frame that best matches each analyst annotation.
+
 
 \begin{figure}[!htb]
     \centering
@@ -177,7 +180,7 @@ To leverage movement characteristics of smoke, HMS analysts use multi-frame anim
 \end{figure}
 
 
-We select either GOES-East or GOES-West based on the solar zenith angle (SZA) to optimize for forward Mie scattering. For smoke identification, this approach can achieve a much higher SNR than imaging the earth’s surface from an arbitrary angle. While the atmosphere is composed primarily of molecules with size \(<\)1nm, smoke particles are larger in comparison, varying from 100 nm -- 10 \(\mu\)m in diameter, \(d\). When the \(\lambda\) of light \(\lambda<d\), the elastic scattering of light against matter is modeled through Mie rather than Rayleigh scattering (Figure \ref{mei}). Therefore, smoke observation favors forward scattering and short \(\lambda\) so that we select (1) the satellite that would observe the most Mie forwad scattering as demostrated in Figures \ref{WEST_EAST_bands}(a) vs \ref{WEST_EAST_bands}(b) that show GOES-East displaying a higher SNR near sunset compared to GOES-West. (2) the three shortest \(\lambda\) ABI bands (C01-C03: 0.47, 0.64, and 0.865\(\mu\)m) that give the highest smoke SNR as seen in Figures \ref{WEST_EAST_bands}(c)-\ref{WEST_EAST_bands}(e).
+We select either GOES-East or GOES-West based on the solar zenith angle (SZA) to optimize for forward Mie scattering, which enhances smoke visibility in satellite imagery. Smoke particles (100~nm--10~\textmu m) scatter light predominantly via Mie scattering when \(\lambda < d\), favoring short wavelengths and forward angles (figure \ref{mei}). To generate the Mie-derived dataset, we evaluate the available satellite platforms for each annotation time window and choose the satellite (East or West) that is expected to observe the strongest forward scattering geometry based on sun-satellite alignment. This ensures selection of the satellite view with the highest potential smoke SNR if smoke were present. Therefore, we select (1) the satellite expected to yield the strongest Mie forward scattering (Figures \ref{WEST_EAST_bands}(a) vs \ref{WEST_EAST_bands}(b)) and (2) the three shortest wavelength ABI bands (C01--C03: 0.47, 0.64, and 0.865~\textmu m) (Figures \ref{WEST_EAST_bands}(c)-\ref{WEST_EAST_bands}(e)).
 
 
 \begin{figure}[!htb]
@@ -192,7 +195,15 @@ We select either GOES-East or GOES-West based on the solar zenith angle (SZA) to
     \caption{True color (a) GOES-WEST and (b) GOES-EAST imagery from March \(23^{rd}\), 2022 centered at (\(31.1^{\circ}\), \(-93.8^{\circ}\)) in Texas, USA taken at 23:20 UTC. The GOES-EAST raw band imagery for (c) blue, (d) red and (e) veggie bands show variations in the SNR for smoke detection in relation to the \(\lambda\) of light being measured.}\label{WEST_EAST_bands}
 \end{figure}
 
-For the existing dataset of HMS smoke plume annotations and all corresponding satellite imagery, \(\mathcal{D} = \{\mathcal{X}, \mathcal{Y}\}\), for each sample, a label \(y_i \in \mathcal{Y}\) has a set of satellite imagery \([x_{(i,t_0)},...,x_{(i,t_N)}] \in \mathcal{X}\) over the analyst defined time window \(t\). To develop a one-to-one data-to-label dataset, we generate IPLs to develop a subset of \(\mathcal{D}\), denoted as \(\mathcal{D}_p\), that has a one-to-one ratio such that \(|\mathcal{X}_p| = |\mathcal{Y}|\), where we aim to find the satellite image that has the maximum overlap between the geolocation of smoke in the imagery and the analyst annotation using the PLDR method shown in Figure \ref{PLDR}.
+\subsubsection{From Full Dataset \(\mathcal{D}\) to Mie-Derived Dataset \(\mathcal{D}_M\)}
+
+Let \(\mathcal{D} = \{\mathcal{X}, \mathcal{Y}\}\) be the original dataset, where each label \(y_i \in \mathcal{Y}\) corresponds to multiple satellite images \([x_{(i,t_0)},...,x_{(i,t_N)}] \in \mathcal{X}\) over a given time window. Using Mie scattering principles, we select the image \(x_{(i,t_M)}\) with the highest expected smoke SNR to form a one-to-one dataset \(\mathcal{D}_M = \{\mathcal{X}_M, \mathcal{Y}\}\) such that \(\mathcal{X}_M \subset \mathcal{X}\) and \(|\mathcal{X}_M| = |\mathcal{Y}|\). Based on forward scattering criteria, the trivial strategy would be to pull imagery from GOES-West right after sunrise and from GOES-East right before sunset when the SZA is closest to \(90^{\circ}\). To avoid image artifacts caused by extreme SZA, we exclude scenes with SZA\(>88^\circ\) \cite{zen_angle}. The resulting dataset \(\mathcal{D}_M\) (Table~\ref{split}) contains over 200,000 samples where the satellite image is chosen based on which frame within the annotation time window would exhibit the strongest forward scattering geometry and thus the highest potential smoke SNR if smoke were present. 
+
+
+\subsubsection{PLDR Dataset \(\mathcal{D}_p\)} 
+
+The \(\mathcal{D}_M\) data selection process introduces a bias for resulting models to limit smoke identification to higher SZAs. Additionally, \(\mathcal{D}_M\) is limited to providing the timestamp for maximum possible smoke SNR, it does not give information to point to which image aligns best with the smoke label. To address these limitations, we propose using \(\mathcal{D}_M\) as a intermediary dataset in the PLDR workflow (Figure \ref{PLDR}) that will predict the satellite image that best matches the analyst's smoke annotation to produce \(\mathcal{D}_p\).
+
 
 \begin{figure}[!htb]
     \centering
@@ -202,32 +213,17 @@ For the existing dataset of HMS smoke plume annotations and all corresponding sa
         (a) For original dataset \(\mathcal{D}\) - analyst annotation \(y_i\) corresponds to \(N\) satellite images across time window \(t\) so that \(([x_{(i,t_0)},...,x_{(i,t_N)}], y_i) \in \mathcal{D}\); 
         (b) use Mie scattering to find the time, \(t_M\), that corresponds with satellite image \(x_{(i,t_M)}\) that would produce the highest possible SNR if smoke was present; 
         (c) resulting \(\mathcal{D}_M\) is one-to-one \((x_{(i,t_M)}, y_i) \in \mathcal{D}_M\);
-        (d) parent model \(f_\circ\) is trained; 
         (d) parent model \(f_\circ\) is trained on \(\mathcal{D}_M\) such that \(f_\circ(x_{(i,t_M)})=y_i\);
         (e) apply a greedy algorithm \(f_\circ([x_{(i,t_0)},...,x_{(i,t_N)}])=[y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\) to create IPLs \(y^*\) for each candidate image; 
         (f) compute the intersection over union (IoU) between \(y^*\) and \(y_i\) to identify the time \(t_p\) where the IPL and analyst annotation have the maximum IoU; 
-        (g) best match image \(x_{(i,t_p)}\) selected; 
-        (g) match \(t_p\) to its correpsonding image \(x_{(i,t_p)}\) that should best match the analyst annotation;
+        (g) match \(t_p\) to its correpsonding image \(x_{(i,t_p)}\) that is predicted to best match the analyst annotation;
         (h) SmokeViz dataset \(\mathcal{D}_p\) created; 
         (i) child model \(f_c\) is trained on \(\mathcal{D}_p\) such that \(f_c(x_{(i,t_p)})=y_i\) is used to detect and classify the density of wildfire smoke plumes in GOES imagery.
     }
 \label{PLDR}
 \end{figure}
 
-To train an initial parent model, \(f_{\circ}\), we developed a method of leveraging Mie scattering physics to select \(x_{(i,t_M)} \in \mathcal{X}\) (Figure \ref{PLDR}(b)) so that \(x_{(i,t_M)}\) has a higher chance than random selection out of the set of imagery \([x_{(i,t_0)},...,x_{(i,t_N)}]\) to be representative of \(y_i\). This Mie-Derived Dataset, \(\mathcal{D}_M\) produces a training set so that if there is smoke present during the entire time window, the selected timestamp \(t_M\) would give the highest smoke SNR. 
 
-More importantly than finding the timestamp for maximum the SNR, we want to determine which image actually has smoke present within the smoke label boundaries. We use \(\mathcal{D}_M\) to train \(f_{\circ}\) (Figure \ref{PLDR}(d)), to identify smoke in satellite imagery, and then use that \(f_{\circ}\) to create IPLs of each satellite image in a given annotation's time-window (Figure \ref{PLDR}(e)). From those results, the optimal satellite image is chosen based on which image's IPLs has the greatest overlap with the analyst annotation (Figure \ref{PLDR}(f)-(h)).
-
-
-\subsubsection{From Full Dataset \(\mathcal{D}\) to Mie-Derived Dataset \(\mathcal{D}_M\)}
-
-
-
-Let \(\mathcal{D} = \{\mathcal{X}, \mathcal{Y}\}\) be the original dataset, where each label \(y_i \in \mathcal{Y}\) corresponds to multiple satellite images \([x_{(i,t_0)},...,x_{(i,t_N)}] \in \mathcal{X}\) over a given time window. Using Mie scattering principles, we select the image \(x_{(i,t_M)}\) with the highest expected smoke SNR to form a one-to-one dataset \(\mathcal{D}_M = \{\mathcal{X}_M, \mathcal{Y}\}\) such that \(\mathcal{X}_M \subset \mathcal{X}\) and \(|\mathcal{X}_M| = |\mathcal{Y}|\). The Mie-derived satellite image is chosen based on which frame within the annotation time window would exhibit the strongest forward scattering geometry and thus the highest potential smoke SNR if smoke were present. 
-
-Based on forward scattering criteria, the trivial strategy would be to pull imagery from GOES-West right after sunrise and from GOES-East right before sunset when the SZA is closest to \(90^{\circ}\). However, the time when the SZA approaches \(90^{\circ}\) coincides with when there are maximized atmospheric interactions that cause an increase in noise and artifacts \cite{zen_angle}. To avoid image artifacts caused by extreme SZA, we exclude scenes with SZA \(>88^\circ\) if there are lower SZA images available. The resulting dataset \(\mathcal{D}_M\) contains over 200,000 samples and is used to train the parent model \(f_{\circ}\).
-
-\subsubsection{PLDR Dataset \(\mathcal{D}_p\)} 
 
 \begin{table}
 \parbox{.45\linewidth}{
@@ -260,20 +256,14 @@ Based on forward scattering criteria, the trivial strategy would be to pull imag
 }
 \end{table}
 
-
 We train \(f_{\circ}\) on \(\mathcal{D}_M\) (table \ref{split}) to find smoke in GOES imagery. The model is then applied across each satellite image within the time window \([x_{(i,t_0)},...,x_{(i,t_N)}]\) to produce intermediary pseudo-labels (IPLs), \([y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\). We compute the intersection over union (IoU) between each \(y^*\) and the corresponding analyst label \(y_i\), selecting the timestamp \(t_p\) that yields the maximum IoU to define \(\mathcal{D}_p = \{x_{(i,t_p)}, y_i\}\).
 
-\begin{equation} \label{overall_iou}
-    IoU_{\text{overall}} = \frac{\sum\limits_{j=\text{light}}^{\text{heavy}}|y_{j}\cap y^*_{j}|}{\sum\limits_{j=\text{light}}^{\text{heavy}}|y_{j}|\cup|y^*_{j}|}
-\end{equation}
 
-To build \(f_{\circ}\), we implement \texttt{Segmentation Models PyTorch} \cite{semantic} with EfficientNetV2 \cite{efficientnetv2} as the encoder and PSPNet \cite{pspnet} as the decoder. Input images are \(256\times256\times3\) true-color snapshots; the output is a \(256\times256\times3\) classification map predicting categorical smoke density. We use thermometer encoding to capture the ordinal nature of smoke density classes (Table \ref{therm}) and apply binary cross-entropy loss across the classes. We use a confidence threshold of IoU  >0.01 \cite{conf_thresh} to exclude samples with negligible overlap. 
-
-The same dataset split choices (table \ref{split}) and model setup that were used for \(\mathcal{D}_{M}\) and \(f_{\circ}\) were implemented for to train a child model \(f_c\) on \(\mathcal{D}_p\). To assess if training with \(\mathcal{D}_{p}\) can produce a more robust semantic segmentation model compared to training on \(\mathcal{D}_M\) we run \(f_c\) on the \(\mathcal{D}_{p}\) and \(\mathcal{D}_{M}\) test sets. 
+To build \(f_{\circ}\), we implement \texttt{Segmentation Models PyTorch} \cite{semantic} with EfficientNetV2 \cite{efficientnetv2} as the encoder and PSPNet \cite{pspnet} as the decoder. Input images are 256\(\times\)256 true-color snapshots; the output is a 256\(\times\)256 classification map predicting categorical smoke density. We use thermometer encoding (Table~\ref{therm}) and apply binary cross-entropy loss across density levels. Thermometer encoding is chosen over one-hot encoding because it captures the ordinal structure of smoke density categories (none < light < medium < heavy). In thermometer encoding, each higher class includes all lower class activations (e.g., heavy = [1 1 1]), allowing the model to learn not just class distinctions, but the relative severity of smoke. We use a confidence threshold of IoU  >0.01 \cite{conf_thresh} to exclude samples with negligible overlap. 
 
 \subsection{Benchmark Models}
 
-We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) by varying the semantic segmentation architectures. We train Linknet \cite{linknet}, PSPNet \cite{pspnet} and MANet \cite{manet} using the same encoder for \(f_c\) and \(f_{\circ}\), EfficientNetV2. Each model is trained over 100 epochs using a batch size of 32 and the Adam optimizer on 8 16GB memory Nvidia P100 GPUs over 12 hours of allotted training time. We choose these architectures because of their abilities to capture multi-scale objects such the varying spatial extents of smoke plumes.
+We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) using Linknet \cite{linknet}, PSPNet \cite{pspnet} and MANet \cite{manet}. Each model is trained for 100 epochs using a batch size of 32 and the Adam optimizer on 8 16GB Nvidia P100 GPUs for 12 hours. These architectures are selected for their effectiveness in segmenting multi-scale objects such as smoke plumes.
 
 \section{Results}
 
