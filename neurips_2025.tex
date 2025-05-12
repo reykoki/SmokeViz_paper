@@ -202,8 +202,7 @@ Let \(\mathcal{D} = \{\mathcal{X}, \mathcal{Y}\}\) be the original dataset, wher
 
 \subsubsection{PLDR Dataset \(\mathcal{D}_p\)} 
 
-The \(\mathcal{D}_M\) data selection process introduces a bias for resulting models to limit smoke identification to higher SZAs. Additionally, \(\mathcal{D}_M\) is limited to providing the timestamp for maximum possible smoke SNR, it does not give information to point to which image aligns best with the smoke label. To address these limitations, we propose using \(\mathcal{D}_M\) as a intermediary dataset in the PLDR workflow (Figure \ref{PLDR}) that will predict the satellite image that best matches the analyst's smoke annotation to produce \(\mathcal{D}_p\).
-
+The \(\mathcal{D}_M\) data selection process introduces a potential bias for resulting models to limit smoke identification to higher SZAs. Additionally, \(\mathcal{D}_M\) is limited to providing the timestamp for maximum possible smoke SNR, it does not give information to point to which image aligns best with the smoke label. To address these limitations, we propose using \(\mathcal{D}_M\) as a intermediary dataset in the PLDR workflow (Figure \ref{PLDR}) that will predict the satellite image that best matches the analyst's smoke annotation to produce \(\mathcal{D}_p\).
 
 \begin{figure}[!htb]
     \centering
@@ -225,7 +224,7 @@ The \(\mathcal{D}_M\) data selection process introduces a bias for resulting mod
 
 
 
-\begin{table}
+\begin{table}[!htb]
 \parbox{.45\linewidth}{
 \centering
     \caption{A comparison of how smoke density would be represented by one-hot encoding commonly used for categorical data to thermometer encoding often used for ordinal data.}\label{therm}
@@ -256,21 +255,20 @@ The \(\mathcal{D}_M\) data selection process introduces a bias for resulting mod
 }
 \end{table}
 
-We train \(f_{\circ}\) on \(\mathcal{D}_M\) (table \ref{split}) to find smoke in GOES imagery. The model is then applied across each satellite image within the time window \([x_{(i,t_0)},...,x_{(i,t_N)}]\) to produce intermediary pseudo-labels (IPLs), \([y^*_{(i,t_0)},...,y^*_{(i,t_N)}]\). We compute the intersection over union (IoU) between each \(y^*\) and the corresponding analyst label \(y_i\), selecting the timestamp \(t_p\) that yields the maximum IoU to define \(\mathcal{D}_p = \{x_{(i,t_p)}, y_i\}\).
-
 
 To build \(f_{\circ}\), we implement \texttt{Segmentation Models PyTorch} \cite{semantic} with EfficientNetV2 \cite{efficientnetv2} as the encoder and PSPNet \cite{pspnet} as the decoder. Input images are 256\(\times\)256 true-color snapshots; the output is a 256\(\times\)256 classification map predicting categorical smoke density. We use thermometer encoding (Table~\ref{therm}) and apply binary cross-entropy loss across density levels. Thermometer encoding is chosen over one-hot encoding because it captures the ordinal structure of smoke density categories (none < light < medium < heavy). In thermometer encoding, each higher class includes all lower class activations (e.g., heavy = [1 1 1]), allowing the model to learn not just class distinctions, but the relative severity of smoke. We use a confidence threshold of IoU  >0.01 \cite{conf_thresh} to exclude samples with negligible overlap. 
 
 \subsection{Benchmark Models}
 
-We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) using Linknet \cite{linknet}, PSPNet \cite{pspnet} and MANet \cite{manet}. Each model is trained for 100 epochs using a batch size of 32 and the Adam optimizer on 8 16GB Nvidia P100 GPUs for 12 hours. These architectures are selected for their effectiveness in segmenting multi-scale objects such as smoke plumes.
+We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) using DeepLabV3+ \cite{deeplab} and PSPNet \cite{pspnet} with EfficientNetV2 \cite{efficientnetv2}, DPT \cite{dpt} with ViT \cite{vit}, Segfomer \cite{segformer} and UperNet \cite{upernet} with EfficientVit \cite{efficientvit}. Each model is trained for 100 epochs using a batch size of 16 and the Adam optimizer on 8 16GB Nvidia P100 GPUs. These architectures are selected for their relatively low memory requirements and effectiveness in segmenting multi-scale objects such as smoke plumes.
 
 \section{Results}
 
-To interpret the performance of \(f_{\circ}\), we report the IoU metrics in table \ref{iou_results} that were computed by running \(f_{\circ}\) and \(f_c\) on \(\mathcal{D}_M\) and \(\mathcal{D}_{p}\). For each density, we calculate the IoU using the total set of pixels that \(f_{\circ}\) predicts as that density of smoke and the entire set of pixels labeled by the analyst as a particular smoke density over all imagery contained in the testing dataset. Additionally, we compute the overall IoU for all densities by first computing the number of pixels that intersect their corresponding density and divide that by the total number of pixels that make up the union of model predicted and analyst labeled smoke in the testing dataset.
+We evaluate the performance of \(f_{\circ}\) and \(f_c\) using Intersection over Union (IoU) metrics on the test sets of both \(\mathcal{D}_M\) and \(\mathcal{D}_p\), as shown in Table~\ref{iou_results}. For each smoke density class, IoU is calculated as the pixel-level intersection between model predictions and HMS analyst labels, divided by their union, aggregated over all test samples. Overall IoU is computed by summing intersections across all density classes and dividing by the total union of predicted and labeled smoke pixels.
 
-\begin{table} 
-    \caption{IoU results per density of smoke and over all densities using \(f_{\circ}\) and \(f_c\) with \(\mathcal{D}_M\) and \(\mathcal{D}_p\).}\label{iou_results}
+\begin{table}[!htb]
+    \caption{IoU results per smoke density and overall, comparing \(f_{\circ}\) and \(f_c\) run on \(\mathcal{D}_M\) and \(\mathcal{D}_p\) test sets.}
+    \label{iou_results}
     \centering
     \begin{tabular}{lcc|cc}
         \toprule
@@ -278,41 +276,45 @@ To interpret the performance of \(f_{\circ}\), we report the IoU metrics in tabl
         \midrule
         \multicolumn{1}{c}{} & \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) & \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \\
         \midrule
-        Heavy   & 0.278 & 0.368 & 0.218 &  0.411 \\
-        Medium  & 0.310 & 0.417 & 0.319 &  0.484 \\
-        Light   & 0.480 & 0.585 & 0.491 &  0.660 \\
-        Overall & 0.430 & 0.533 & 0.438 &  0.607 \\
+        heavy   & 0.278 & 0.368 & 0.218 &  0.411 \\
+        medium  & 0.310 & 0.417 & 0.319 &  0.484 \\
+        light   & 0.480 & 0.585 & 0.491 &  0.660 \\
+        overall & 0.430 & 0.533 & 0.438 &  0.607 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-\begin{figure*}
+\begin{figure}[!htb] 
     \centering
     \includegraphics[width=\linewidth]{figures/final_results_small.png}
-    \caption{GOES-West imagery showing smoke on June 8th, 2022 in Alaska where, at this geolocation (\(61.06^{\circ}\)N, \(156.12^{\circ}\)W), daylight was between 12:43-7:53 UTC. The HMS smoke annotations (top row) span from 18:50 to 23:50 UTC and are compared to the \(f_{\circ}\) generated pseudo-labels (bottom row). The first column (dotted outline) would be the GOES imagery selected for \(\mathcal{D}_{M}\) since it is closest to sunrise. The last column (solid outline) was selected for \(\mathcal{D}_{p}\) since it had the highest IoU value between the pseudo-label and analyst annotation. The IoU score over all densities is reported at the bottom of each column.}
+        \caption{GOES-West imagery from June 8, 2022, over Alaska (\(61.06^{\circ}\)N, \(156.12^{\circ}\)W). Daylight spanned 12:43--7:53 UTC. The HMS annotations (top row) span 18:50--23:50 UTC and are compared with \(f_{\circ}\)-generated smoke predictions (bottom row). The leftmost frame (dotted) represents the Mie-derived image; the rightmost frame (solid) was selected via PLDR and achieves higher IoU.}
+
     \label{ml_vs_mei}
-\end{figure*}
+\end{figure}
 
-An illustration of a pseudo-label picked image better representing the analyst annotation when compared to the Mie-derived image selection is evident in Figure \ref{ml_vs_mei}, where the heavy density smoke IoU increases from 0.01 to 0.59. The analyst annotation for these densities cover 5 hours of imagery, the Mie-derived selection optimizes for the image closest to sunrise while the pseudo-label image selection chooses the image with the highest overlap between the pseudo-label and the analyst annotation. Figure \ref{ml_vs_mei} also illustrates how using a deep learning model can provide higher time resolution and give a dynamic representation of smoke over time.
+Figure~\ref{ml_vs_mei} illustrates a case in which the PLDR-selected frame better represents the HMS annotation than the Mie-derived selection. Here, the heavy smoke IoU improves from 0.01 to 0.59. While the Mie-derived image is selected based on its proximity to sunrise, PLDR chooses the frame with the highest overlap between the model-generated intermediary pseudo-label and the analyst annotation. This example highlights PLDR’s advantage in resolving temporal ambiguity.
 
-To get an idea on how \(f_{c}\) compares to the HMS analyst annotations we show a series of samples from \(\mathcal{D}_{p}\) in Figure \ref{bench}. The examples give a qualitative representation of how the predictions from \(f_c\) can provide more detailed boundaries of smoke densities than the HMS annotations do.
+To further examine the performance of \(f_c\), we can qualitatively compare its predictions against HMS annotations for samples from \(\mathcal{D}_p\) in Figure~\ref{examples}. The model outputs capture more spatially detailed and coherent smoke boundaries compared to the coarser, polygon-based analyst labels.
 
-\begin{table}[h]
-    \caption{Comparison of semantic segmentation model IoU performance on \(\mathcal{D}_{p}\).}\label{bench}
+\begin{table}[!htb] 
+    \caption{Comparison of segmentation benchmark model IoU metrics on \(\mathcal{D}_{p}\).}\label{bench}
     \centering
-    \begin{tabular}{cccrrcrc}
+    \begin{tabular}{lccccc}
         \toprule
-           & DLV3+ & MANet & PSPNet & Linknet \\
+        \textbf{encoder} & EfficientNetV2 \cite{efficientnetv2} & \cite{efficientnetv2} & ViT \cite{vit} & EfficientViT \cite{efficientvit} & \cite{efficientvit}\\
+        \textbf{decoder} & DeepLabV3+ \cite{deeplab} & PSPNet \cite{pspnet} & DPT \cite{dpt} & Segformer \cite{segformer} & UperNet \cite{upernet}\\
         \midrule
-        heavy   & 0.411 & 0.336  & 0.355 & 0.324 \\
-        medium  & 0.484 & 0.487  & 0.502 & 0.456 \\
-        light   & 0.662 & 0.675  & 0.690 & 0.662 \\
-        overall & 0.607 & 0.615  & 0.626 & 0.601 \\
+%        dataset & \multicolumn{5}{c}{\(\mathcal{D}_M\)} \\
+%        \midrule
+        heavy   & 0.2894 & 0.3222 & 0.2091 & 0.2185 & 0.3099 \\
+        medium  & 0.4091 & 0.4289 & 0.3946 & 0.3978 & 0.4042 \\
+        light   & 0.4424 & 0.5045 & 0.5155 & 0.4331 & 0.4275 \\
+        overall & 0.4172 & 0.4677 & 0.4608 & 0.4055 & 0.4098 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-The results for the benchmarking models (table \ref{bench}) show similar performance across the models. DeepLabV3+ (\(f_c\)) gives the highest heavy density smoke IoU value, while PSPNet gives the highest overall IoU score.
+To benchmark performance across segmentation architectures, we evaluate several encoder-decoder models trained on \(\mathcal{D}_p\). Table~\ref{bench} reports IoU scores by smoke density and overall. While DeepLabV3+ achieves the highest IoU for heavy smoke, PSPNet yields the best overall performance. Results across models are relatively consistent, highlighting the robustness of the SmokeViz dataset for training diverse architectures.
 
 \begin{figure}[!htb]
     \centering
