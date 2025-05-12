@@ -40,7 +40,9 @@
 
 \newcommand\reynotes[1]{\textcolor{purple}{#1}}
 
-\title{SmokeViz: Using Pseudo-Labels to Develop a Human-Labeled Deep Learning Dataset of Wildfire Smoke Plumes in Satellite Imagery}
+%\title{SmokeViz: Using Pseudo-Labels to Develop a Human-Labeled Deep Learning Dataset of Wildfire Smoke Plumes in Satellite Imagery}
+\title{SmokeViz: A Large-Scale Satellite Dataset for Wildfire Smoke Detection and Segmentation}
+
 
 % The \author macro works with any number of authors. There are two commands
 % used to separate the names and addresses of multiple authors: \And and \AND.
@@ -94,35 +96,48 @@
 
 \section{Introduction}
 
-Due in part to public policy, average fine particulate matter (PM\textsubscript{2.5}) levels in the US have generally declined over the past few decades \cite{clean_air_act}. Despite those improvements, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations in the US has more than doubled between 2010 to 2020, accounting for up to half of overall PM\textsubscript{2.5} exposure in Western regions \cite{smoke_PM}. Increases in PM\textsubscript{2.5} are a concern since ambient PM\textsubscript{2.5} exposure is a leading environmental risk factor for adverse health outcomes and premature mortality \cite{smoke_mortality}. These risks highlight the urgent need for effective wildfire monitoring methods to mitigate associated health impacts. 
+Due in part to environmental regulation, average fine particulate matter (PM\textsubscript{2.5}) levels in the United States have declined over recent decades \cite{clean_air_act}. However, from 2010 to 2020, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations more than doubled, accounting for up to half of total exposure in parts of the Western U.S. \cite{smoke_PM}. 
 
-Without the use of satellite remote sensing, wildfire monitoring has relied on ground-based methods, such as forest service patrols, manned lookout towers, and aviation surveillance \cite{smoke_monitoring}. While these methods provide valuable localized insights, they are constrained by geographical and logistical limitations, often failing to deliver timely and comprehensive data, especially over large and remote areas. In contrast, satellite imagery offers continuous, wide-area coverage and real-time streaming information critical for assessing the extent and movement of wildfire smoke.
+Due in part to public policy, average fine particulate matter (PM\textsubscript{2.5}) levels in the United States have declined over recent decades \cite{clean_air_act}. However, from 2010 to 2020, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations more than doubled, accounting for up to half of total PM\textsubscript{2.5} exposure in Western U.S. \cite{smoke_PM}. This is particularly concerning, as ambient PM\textsubscript{2.5} is a leading environmental risk factor for adverse health outcomes and premature mortality \cite{smoke_mortality}. These trends/risks highlight the urgent need for scalable and timely smoke monitoring systems to mitigate public health risks.
 
-Modern satellite sensors such as the Advanced Baseline Imager (ABI) aboard the Geostationary Operational Environmental Satellites (GOES) \cite{goes}, have revolutionized environmental monitoring. Unlike polar-orbiting satellites like Suomi or Sentinel, geostationary satellites provide persistent observation over fixed regions, essential for tracking the dynamic behavior of wildfire smoke plumes. GOES capabilities enables effective observations of smoke particulate concentration and movement, facilitating real-time air quality assessments.
+Satellite imagery offers the spatial coverage and temporal frequency needed for large-scale smoke monitoring. Geostationary satellites such as the GOES series \cite{goes} are especially well-suited to this task, providing persistent observation over fixed regions—essential for capturing the dynamic behavior of wildfire smoke. 
 
-Integrating satellite data into wildfire smoke monitoring can improve the responsiveness of public health interventions. Mapping the spread and density of smoke allows health authorities to issue timely warnings, initiate evacuation protocols, and allocate resources efficiently. Moreover, historical satellite records can help researchers understand the broader impacts of wildfire smoke, informing policy decisions and mitigation strategies.
+Satellite imagery offers the spatial coverage and temporal frequency needed for large-scale smoke monitoring. In comparison to polar-orbiting satellites like Suomi or Sentinel, Geostationary satellites such as the GOES series \cite{goes} are especially well-suited to this task, providing persistent observation over fixed regions—essential for capturing the dynamic behavior of wildfire smoke plumes. The high temporal resolution and wide coverage of GOES imagery enable real-time tracking of smoke concentration and movement, supporting air quality assessments and early warning systems.
 
-In addition, numerical models used for real-time smoke dispersion lack a dedicated smoke analysis product available for data assimilation \cite{hrrr, rrfs}. This absence leads to delayed model spin-up and propagates errors in the forecasts. A satellite-driven, real-time smoke assimilation product could significantly decrease the computational requirements and enhance the accuracy of existing smoke dispersion models. 
+Even with the advances in remote sensing, existing deep learning satellite datasets for wildfire smoke detection face several limitations. They are often small in scale, restricted to specific regions or events, and focus on scene-level classification rather than pixel-level segmentation. Most do not differentiate between smoke density levels, are not publicly available, and lack standardized benchmarks for semantic segmentation. While NOAA’s Hazard Mapping System (HMS) provides a large-scale, expert-labeled dataset, its annotations span multi-hour time windows that vary in duration. This creates a temporal mismatch between the labels and individual satellite frames, complicating their direct use for supervised learning.
+
+To address these challenges, we introduce \textbf{SmokeViz}, a large-scale satellite dataset for semantic segmentation of wildfire smoke plumes. SmokeViz includes over 180,000 annotated samples derived from GOES-East and GOES-West imagery, aligned with HMS analyst annotations. To resolve the temporal ambiguity in the original labels, we propose a semi-supervised method called \textbf{pseudo-label dimension reduction (PLDR)}, which uses intermediary pseudo-labels to select the satellite image that best matches each smoke annotation. The resulting dataset provides one-to-one image-to-label pairs with ordinal smoke density masks, suitable for supervised deep learning.
+
+\textbf{SmokeViz} serves as a benchmark for wildfire smoke segmentation and as a resource for the broader machine learning community working with geospatial, temporal, and remote sensing data. It supports new directions in ordinal segmentation, semi-supervised learning with temporal uncertainty, and pretraining for Earth observation tasks involving dynamic atmospheric phenomena.
+
+\textbf{Our contributions are:}
+\begin{itemize}
+    \item We introduce \textbf{SmokeViz}, the largest satellite-based dataset for wildfire smoke segmentation, with over 180,000 samples from GOES imagery.
+    \item We propose \textbf{PLDR}, a physics-guided semi-supervised method for aligning coarse human annotations with temporally optimal satellite imagery.
+    \item We provide benchmark segmentation baselines and standardized training splits to support reproducibility and downstream research.
+\end{itemize}
 
 \section{Related Work}
 
-\subsection{Numerical}
+\subsection{Smoke Detection and Labeling Methods}
 
-Multi-channel thresholding remains a widely used method for distinguishing smoke pixels from phenomena with similar signatures such as dust or clouds \cite{threshold}. Thresholds are derived from historical labeled data, identifying optimal radiance values for each channel associated with each class. 
-However, thresholds are tuned to particular biogeographies and struggle to generalize across varying regions and fuel types \cite{thresh_geog}.
+Multi-channel thresholding remains a widely used method for distinguishing smoke from similar atmospheric signatures such as dust or clouds using channel-specific radiance values \cite{threshold}. These thresholds are typically derived from labeled historical data and are fine-tuned to specific regions and fuel types, limiting their generalizablity \cite{thresh_geog}. In contrast, the SmokeViz dataset spans a wide range of biogeographies across North America and can serve as a source of refined analyst-labeled examples for developing more generalizable thresholding techniques.
 
-\subsection{Analyst} 
+Large parameterized numerical models are used for forecasting smoke dispersion, but not for smoke detection itself. Systems such as HRRR-Smoke and RRFS \cite{hrrr, rrfs} rely on computationally intensive forecasts requiring nearly 200 dynamic meteorological inputs. A key limitation of these models is the absence of a real-time smoke analysis product for data assimilation, resulting in delayed model spin-up and compounded forecast errors. Model predictions from SmokeViz could help fill this gap, offering a real-time, satellite-driven alternative to support data assimilation for operational smoke dispersion forecasting.
 
+Manual smoke labeling is performed by trained analysts through visual inspection of satellite imagery. NOAA’s Hazard Mapping System (HMS) provides a analyst-labeled wildfire smoke dataset \cite{hms, hms_val}. HMS analysts examine GOES imagery sequences to track smoke plume movement and annotate the approximate spatial extent and qualitative density of smoke (light, medium, heavy), as illustrated in Figure~\ref{densities}. Annotations are issued on a rolling basis and span time windows ranging from instantaneous to over 20 hours \cite{hms_web}. While HMS provides high-quality expert annotations, its operational format introduces challenges for supervised learning: annotations are temporally coarse, vary in length, and lack one-to-one correspondence with satellite frames. SmokeViz refines HMS annotations into temporally resolved, frame-aligned labels, enabling real-time, continuous predictions of smoke extent and density.
 
-An alternative to numerical thresholding is manual labeling by trained analysts, who visually inspect satellite imagery to identify smoke. A noteworthy example is National Oceanic and Atmospheric Administration's (NOAA) Hazard Mapping System (HMS) fire and smoke products \cite{hms, hms_val}. HMS analysts scan timeseries of satellite imagery to observe plume movement and manually draw polygons representing the general smoke extent and density. These annotations vary in temporal resolution and are released on a rolling, undefined schedule, typically multiple times per day depending on observation conditions.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\linewidth]{figures/variations_small.png}\label{densities}
+    \caption{HMS smoke annotations overlaid on GOES imagery. Yellow, orange, and red contours indicate light, medium, and heavy smoke density, respectively. (a) and (b) show canonical smoke plumes; (c)–(e) illustrate density label variation across scenes.}
+\end{figure}
 
-While the HMS program produces high-quality and actionable smoke products, it is limited in scalability and timeliness. Expanding beyond its current North American scope would require significant increases in personnel and time. Nevertheless, the HMS product remains a valuable source of hand labeled data. In this work, we use HMS smoke annotations as ground truth for supervised training. Each annotation includes a geolocated polygon and a qualitative density label light, medium, or heavy based on visual opacity (Figure \ref{densities}a). Annotations are linked to temporal windows ranging from instantaneous to as long as 22 hours, representing an approximate time-integrated depiction of smoke extent \cite{hms_web}.
+\subsection{Deep Learning Datasets and Models for Wildfire Smoke}
 
-\subsection{Deep Learning}
+Recent efforts have applied deep learning to wildfire smoke detection using a variety of satellite sources and label strategies. SmokeNet \cite{smokenet} employs a convolutional neural network (CNN) to classify MODIS image scenes as containing smoke or not, using student-provided labels. SatlasPretrain \cite{satlas} includes a small set of Sentinel-2 images labeled for smoke as part of a larger multi-label pretraining dataset. While scene classification methods can provide wildfire detection information, they do not capture spatial characteristics of smoke plumes that segmentation would be more appropiate to capture.
 
-To address the limitations associated with thresholding and manual annotation, recent research has explored deep learning techniques for smoke detection. For example, SmokeNet uses a convolutional neural network (CNN) to classify whether a MODIS satellite image contains smoke \cite{smokenet}. Larsen et al.\ employed a CNN for pixel-wise smoke detection using Himawari-8 imagery for a single wildfire event \cite{larsen}. Wen et al.\ proposed a CNN that uses GOES-East imagery as input and HMS annotations as training labels \cite{smoke_goes}. Unlike previous GOES-based machine learning datasets that include data from only one of the two operational GOES-series satellites, most commonly opting for GOES-East \cite{smoke_goes, wildfire_detect, goes_conv, contrail}, the annotations in SmokeViz are matched with either GOES-East or GOES-West based on which satellite has optimal observational conditions of the event. 
-
-The success of deep learning methods depends on the availability of large, representative datasets \cite{data_size}. Prior smoke detection datasets, however, contain a relatively small number of samples \ref{studies}, where one sample represents a satellite image containing smoke with a singular time and geolocation. For comparison, standard computer vision benchmark datasets such as CIFAR-10 \cite{cifar}, MNIST \cite{mnist} and ImageNet \cite{imgnet} contain tens of thousands to milions of labeled samples. To address this gap, we introduce SmokeViz, the largest known smoke plume dataset with over 180,000 annotated samples.
+Several datasets have been developed for smoke segmentation, but they are have been limited in scope. Wen et al.\ \cite{smoke_goes} trained a CNN on GOES-East imagery over California and Nevada using HMS annotations from the 2018 wildfire season. Larsen et al.\ \cite{larsen} used Himawari-8 data to detect smoke at the pixel level for a single fire event, using a threshold-based algorithm as ground truth. Table~\ref{studies} compares these datasets in terms of scale, source, and labeling. SmokeViz stands out by offering over 180,000 samples with analyst-generated, frame-aligned labels covering multiple fire seasons, regions, and biogeographies. It is, to our knowledge, the largest and most diverse dataset for smoke plume segmentation.
 
 
 \begin{table*}[h]
@@ -133,33 +148,26 @@ The success of deep learning methods depends on the availability of large, repre
         reference & \verb|#| samples & satellite & \verb|#| bands & label & task & avail.\\
         \midrule
         \cite{smokenet}& 1016 & MODIS & 5 & students & SC & no \\
+        \cite{satlas} & 125 & Sentinel-2 & 3 & crowd sourced & SC & yes \\
         \cite{smoke_goes}& 4095 & GOES-East & 5 & HMS analysts & SS & no \\
         \cite{larsen} & 975 & Himiwari-8 & 7 & algorithm& SS & no \\
-        %Smoke-Unet \cite{wang}& 47 & Landsat-8 & 4 & segmentation & \\
-        \cite{satlas} & 125 & Sentinel-2 & 3 & crowd sourced & SC & yes \\
+        %\cite{wang}& 47 & Landsat-8 & 4 & & \\
         SmokeViz  & 183,672 & GOES-East/West & 3 & HMS analysts & SS & yes \\
         \bottomrule
     \end{tabular}
 \end{table*}
 
+In addition to its relevance for wildfire applications, SmokeViz contributes a challenging benchmark for general-purpose remote sensing vision tasks. Unlike many existing datasets that avoid cloudy scenes \cite{bigearthnet, crops} or focus on sharply bounded features such as cropland \cite{crops}, infrastructure \cite{polyworld}, or oceanic clouds \cite{cyclone, cloud_texture}, smoke has amorphous, fading boundaries in both space and time. Incorporating smoke segmentation into large-scale pretraining corpora, such as SatlasPretrain \cite{satlas}, could enhance generalizable models for Earth observation.
 
-Semi-supervised learning offers a means of expanding labeled datasets by training on a small labeled subset to generate pseudo-labels (PLs) for larger unlabeled data \cite{pseudo}. In the iterative approach, an initial model (the parent) is trained on ground truth data and then applied to unlabeled samples to produce PLs. These are used to train a child model, and the process may repeat over several generations to refine predictions.
+\subsection{Pseudo-labeling}
 
-Semi-supervised learning is an approach that can be used to increase the number of labeled samples in a dataset. This is performed by leveraging a labeled dataset to generate pseudo-labels (PLs) for an often larger, but unlabeled, dataset \cite{pseudo}. In the iterative approach, an initial (the parent) model is trained on ground truth data and the model is applied to unlabeled data to create PLs. These are used to train a child model, and the process may repeat over multiple iterations till model convergence. 
+Semi-supervised learning techniques such as pseudo-labeling have been widely used to expand training data by leveraging unlabeled samples \cite{pseudo}. Typically, a parent model is trained on labeled data and then used to generate pseudo-labels for an unlabeled dataset, which are in turn used to train subsequent models in an iterative process.
 
-In contrast, we propose a non-iterative variant not to enlarge the dataset, but to improve label precision. Our method, pseudo-label dimension reduction (PLDR), generates intermediary pseudo-labels (IPLs) that are not used for training. Instead, IPLs help select the most representative satellite image within each HMS annotation’s time window, thereby reducing temporal dimensionality. The resulting SmokeViz dataset consists of carefully matched analyst-generated smoke plume labels and corresponding GOES imagery.
+In contrast, we propose a non-iterative variation focused not on data expansion, but dataset data-to-label precision. Our method, \textbf{pseudo-label dimension reduction (PLDR)}, generates intermediary pseudo-labels (IPLs) for each satellite frame within the HMS annotation window. Rather than using these labels for training, we use them to identify the satellite image with the greatest alignment to the analyst annotation. This enables the construction of SmokeViz, a temporally disambiguated, one-to-one image-to-label dataset. The resulting dataset methodically pairs the analyst-generated smoke plume labels with selected GOES imagery, enabling high-resolution, temporally accurate segmentation model training.
 
-While SmokeViz is designed to support wildfire smoke detection and segmentation, it also has the potential to serve as a valuable benchmark for remote sensing applications. Unlike many existing datasets that exclude cloudy scenes \cite{bigearthnet, crops} or focus on sharply bounded objects like cropland \cite{crops}, infrastructure \cite{polyworld}, or clouds over oceans \cite{cyclone, cloud_texture}, smoke presents diffuse, fading spatial and temporal boundaries. Incorporating high-quality, smoke-specific datasets like SmokeViz into pretraining datasets such as SatlasPretrain \cite{satlas} has the potential to advance generalizable remote sensing computer vision models.
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\linewidth]{figures/variations_small.png}
-    \caption{HMS smoke annotations overlaid on GOES imagery. Yellow, orange, and red contours indicate light, medium, and heavy smoke density, respectively. (a) and (b) show canonical smoke plumes; (c)–(e) illustrate density label variation across scenes.}
-\end{figure}
 
 \section{Methods}
 \subsection{Datasets}
-
 
 We use imagery from the latest GOES satellites, GOES-16 (East), GOES-17 and GOES-18 (West), each equipped with the ABI, which captures 16 spectral bands from visible to infrared wavelengths (\(\lambda\)s) every 10 minutes. We process bands 1-3 using \texttt{PyTroll} \cite{satpy} to generate 1km true-color composites \cite{true_color}, matching the composite viewed by HMS analysts. These bands correspond to the shortest \(\lambda\)s available on ABI and yield the highest signal-to-noise ratio (SNR).
 
