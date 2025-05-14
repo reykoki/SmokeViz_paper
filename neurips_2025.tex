@@ -260,38 +260,44 @@ We benchmark the SmokeViz dataset \(\mathcal{D}_{p}\) using DeepLabV3+ \cite{dee
 
 \section{Results}
 
-We evaluate the performance of \(f_{\circ}\) and \(f_c\) using Intersection over Union (IoU) metrics on the test sets of both \(\mathcal{D}_M\) and \(\mathcal{D}_p\), as shown in Table \ref{iou_results}. For each smoke density class, IoU is calculated as the pixel-level intersection between model predictions and HMS analyst labels, divided by their union, aggregated over all test samples. Overall IoU is computed by summing intersections across all density classes and dividing by the total union of predicted and labeled smoke pixels.
+We evaluate the performance of \(f_{\circ}\) and \(f_c\) using Intersection over Union (IoU), precision and recall metrics on the test sets of both \(\mathcal{D}_M\) and \(\mathcal{D}_p\), as shown in Table \ref{iou_results}. For each smoke density class, IoU is calculated as the pixel-level intersection between model predictions and HMS analyst labels, divided by their union, aggregated over all test samples. Overall IoU is computed by summing intersections across all density classes and dividing by the total union of predicted and labeled smoke pixels.
 
 \begin{table}[!htb]
-    \caption{IoU results per smoke density and overall, comparing \(f_{\circ}\) and \(f_c\) run on \(\mathcal{D}_M\) and \(\mathcal{D}_p\) test sets.}
+    \caption{Segmentation metrics comparing \( f_{\circ} \) and \( f_c \) on the \( \mathcal{D}_M \) and \( \mathcal{D}_p \) test sets.}
     \label{iou_results}
     \centering
     \begin{tabular}{lcc|cc}
         \toprule
-        \multicolumn{1}{c}{} & \multicolumn{2}{c}{\hspace{1cm}\(f_{\circ}\)} \hspace{1cm} & \multicolumn{2}{c}{\hspace{1cm}\(f_c\)}\\
+        & \multicolumn{2}{c}{\( f_{\circ} \)} & \multicolumn{2}{c}{\( f_c \)} \\
+        \cmidrule(r){2-3} \cmidrule(l){4-5}
+        Metric & \( \mathcal{D}_M \) & \( \mathcal{D}_p \) & \( \mathcal{D}_M \) & \( \mathcal{D}_p \) \\
         \midrule
-        \multicolumn{1}{c}{} & \hspace{1cm}\(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \hspace{1cm} & \hspace{1cm} \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \\
+        Heavy IoU      & 0.1510 & 0.2179 & 0.1649 & 0.2604 \\
+        Medium IoU     & 0.2572 & 0.3417 & 0.2786 & 0.3965 \\
+        Light IoU      & 0.3933 & 0.5054 & 0.4395 & 0.5873 \\
+        Overall IoU    & 0.3483 & 0.4499 & 0.3898 & 0.5250 \\
         \midrule
-        heavy IoU    	&	\hspace{1cm}0.1510	&	0.2179\hspace{1cm} &	\hspace{1cm}0.1649	&	0.2604	\\
-        medium IoU   	&	\hspace{1cm}0.2572	&	0.3417\hspace{1cm} &	\hspace{1cm}0.2786	&	0.3965	\\
-        light IoU    	&	\hspace{1cm}0.3933	&	0.5054\hspace{1cm} &	\hspace{1cm}0.4395	&	0.5873	\\
-        overall IoU  	&	\hspace{1cm}0.3483	&	0.4499\hspace{1cm} &	\hspace{1cm}0.3898	&	0.5250	\\
-        \midrule
-        precision   &	\hspace{1cm}0.6990	&	0.7875\hspace{1cm} &	\hspace{1cm}0.6942	&	0.7907	\\
-        recall      &	\hspace{1cm}0.4098	&	0.5121\hspace{1cm} &	\hspace{1cm}0.4706	&	0.6098	\\
+        Precision      & 0.6990 & 0.7875 & 0.6942 & 0.7907 \\
+        Recall         & 0.4098 & 0.5121 & 0.4706 & 0.6098 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
+As shown in Table \ref{iou_results}, in terms of IoU, models trained on the pseudo-label refined dataset \(\mathcal{D}_p\) consistently outperform those trained on the Mie-derived dataset \( \mathcal{D}_M \) across all smoke density categories. For both the parent model \(f_{\circ}\) and the child model \(f_c\), IoU improves when evaluated on \(\mathcal{D}_p\). The highest overall IoU \(= 0.5250 \), is achieved by \( f_c \) on \( \mathcal{D}_p \), indicating that PLDR improves image-label alignment and reduces training noise.
+
+Precision remains relatively consistent between models, both \( f_{\circ} \) and \( f_c \) achieve precision \(\approx 0.69 \) on \( \mathcal{D}_M \), and precision \(\approx 0.79 \) on \( \mathcal{D}_p \). This suggests that precision is primarily influenced by the test set quality rather than model training set. In contrast, recall improves substantially with PLDR refinement: for \( f_{\circ}\), recall increases from recall \( = 0.4098 \) on \( \mathcal{D}_M \) to \( 0.5121 \) on \( \mathcal{D}_p \); for \( f_c \), it improves from \( 0.4706 \) to \( 0.6098 \). These results demonstrate that training on \(\mathcal{D}_p\) rather than \(\mathcal{D}_M\) increases the model’s ability to detect existing wildifire plumes while maintaining a low false detection rate.
+
+
+Figure \ref{ml_vs_mei} illustrates a case in which the PLDR-selected frame better represents the HMS annotation than the Mie-derived selection. Here, the heavy smoke IoU improves from 0.01 to 0.59. While the Mie-derived image is selected based on its proximity to sunrise, PLDR chooses the frame with the highest overlap between the model-generated intermediary pseudo-label and the analyst annotation. This example highlights PLDR’s advantage in resolving temporal ambiguity.
+
 \begin{figure}[!htb] 
     \centering
     \includegraphics[width=\linewidth]{figures/final_results_small.png}
-        \caption{GOES-West imagery from June 8, 2022, over Alaska (\(61.06^{\circ}\)N, \(156.12^{\circ}\)W). Daylight spanned 12:43-7:53 UTC. The HMS annotations (top row) span 18:50-23:50 UTC and are compared with \(f_{\circ}\)-generated smoke predictions (bottom row). The leftmost frame (dotted) represents the Mie-derived image; the rightmost frame (solid) was selected via PLDR and achieves higher IoU.}
+        \caption{GOES-West imagery from June 8, 2022, over Alaska (\(61.06^{\circ}\)N, \(156.12^{\circ}\)W). Daylight spanned 12:43-7:53 UTC. The single static HMS annotation (top row) spans 18:50-23:50 UTC is compared with \(f_{\circ}\)-generated per-frame smoke predictions (bottom row). The leftmost frame (dotted) represents the Mie-derived image; the rightmost frame (solid) was selected via PLDR and achieves higher IoU.}
 
     \label{ml_vs_mei}
 \end{figure}
 
-Figure \ref{ml_vs_mei} illustrates a case in which the PLDR-selected frame better represents the HMS annotation than the Mie-derived selection. Here, the heavy smoke IoU improves from 0.01 to 0.59. While the Mie-derived image is selected based on its proximity to sunrise, PLDR chooses the frame with the highest overlap between the model-generated intermediary pseudo-label and the analyst annotation. This example highlights PLDR’s advantage in resolving temporal ambiguity.
 
 To further examine the performance of \(f_c\), we can qualitatively compare its predictions against HMS annotations for samples from \(\mathcal{D}_p\) in Figure \ref{examples}. The model outputs capture more spatially detailed and coherent smoke boundaries compared to the coarser, polygon-based analyst labels.
 
