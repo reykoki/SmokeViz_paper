@@ -268,14 +268,17 @@ We evaluate the performance of \(f_{\circ}\) and \(f_c\) using Intersection over
     \centering
     \begin{tabular}{lcc|cc}
         \toprule
-        \multicolumn{1}{c}{} & \multicolumn{2}{c}{\(f_{\circ}\)} & \multicolumn{2}{c}{\(f_c\)}\\
+        \multicolumn{1}{c}{} & \multicolumn{2}{c}{\hspace{1cm}\(f_{\circ}\)} \hspace{1cm} & \multicolumn{2}{c}{\hspace{1cm}\(f_c\)}\\
         \midrule
-        \multicolumn{1}{c}{} & \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) & \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \\
+        \multicolumn{1}{c}{} & \hspace{1cm}\(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \hspace{1cm} & \hspace{1cm} \(\mathcal{D}_M\) & \(\mathcal{D}_{p}\) \\
         \midrule
-        heavy   & 0.278 & 0.368 & 0.218 &  0.411 \\
-        medium  & 0.310 & 0.417 & 0.319 &  0.484 \\
-        light   & 0.480 & 0.585 & 0.491 &  0.660 \\
-        overall & 0.430 & 0.533 & 0.438 &  0.607 \\
+        heavy IoU    	&	\hspace{1cm}0.1510	&	0.2179\hspace{1cm} &	\hspace{1cm}0.1649	&	0.2604	\\
+        medium IoU   	&	\hspace{1cm}0.2572	&	0.3417\hspace{1cm} &	\hspace{1cm}0.2786	&	0.3965	\\
+        light IoU    	&	\hspace{1cm}0.3933	&	0.5054\hspace{1cm} &	\hspace{1cm}0.4395	&	0.5873	\\
+        overall IoU  	&	\hspace{1cm}0.3483	&	0.4499\hspace{1cm} &	\hspace{1cm}0.3898	&	0.5250	\\
+        \midrule
+        precision   &	\hspace{1cm}0.6990	&	0.7875\hspace{1cm} &	\hspace{1cm}0.6942	&	0.7907	\\
+        recall      &	\hspace{1cm}0.4098	&	0.5121\hspace{1cm} &	\hspace{1cm}0.4706	&	0.6098	\\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -297,15 +300,15 @@ To further examine the performance of \(f_c\), we can qualitatively compare its 
     \centering
     \begin{tabular}{lccccc}
         \toprule
-        \textbf{encoder} & EfficientNetV2 \cite{efficientnetv2} & \cite{efficientnetv2} & ViT \cite{vit} & EfficientViT \cite{efficientvit} & \cite{efficientvit}\\
-        \textbf{decoder} & DeepLabV3+ \cite{deeplab} & PSPNet \cite{pspnet} & DPT \cite{dpt} & Segformer \cite{segformer} & UperNet \cite{upernet}\\
+        \textbf{encoder} & EfficientNetV2 \cite{efficientnetv2} & \cite{efficientnetv2} & EfficientViT \cite{efficientvit} & \cite{efficientvit}& ViT \cite{vit} \\
+        \textbf{decoder} & DeepLabV3+ \cite{deeplab} & PSPNet \cite{pspnet} & Segformer \cite{segformer} & UperNet \cite{upernet}& DPT \cite{dpt} \\
         \midrule
 %        dataset & \multicolumn{5}{c}{\(\mathcal{D}_M\)} \\
 %        \midrule
-        heavy   & 0.2894 & 0.3222 & 0.2091 & 0.2185 & 0.3099 \\
-        medium  & 0.4091 & 0.4289 & 0.3946 & 0.3978 & 0.4042 \\
-        light   & 0.4424 & 0.5045 & 0.5155 & 0.4331 & 0.4275 \\
-        overall & 0.4172 & 0.4677 & 0.4608 & 0.4055 & 0.4098 \\
+        heavy   & 0.2766	&	0.2604	&	0.2351	&	0.2374	&	0.2450 \\
+        medium  & 0.3854	&	0.3965	&	0.3707	&	0.3444	&	0.3745 \\
+        light   & 0.5912	&	0.5873	&	0.5259	&	0.5541	&	0.5803 \\
+        overall & 0.5246	&	0.5250	&	0.4732	&	0.4886	&	0.5136 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -330,6 +333,7 @@ In this study, we present \textbf{SmokeViz}, a refined satellite imagery dataset
 
 
 SmokeViz serves as a robust and representative dataset for training models to detect wildfire smoke in GOES imagery at the frame level. In addition to supporting real-time smoke segmentation, this dataset has potential applications in early wildfire detection, air quality monitoring, and as a smoke analysis product for data assimilation into dispersion models. It also provides a challenging benchmark for remote sensing models tasked with segmenting diffuse, low-contrast features like smoke. More generally, this work illustrates how PLDR can be used to resolve resolution mismatches between data and labels, especially in settings with time-series or video data paired with coarse annotations. The dataset is publicly available at \url{https://noaa-gsl-experimental-pds.s3.amazonaws.com/index.html#SmokeViz/} with code available at \url{https://github.com/anonymous-smokeviz/SmokeViz}. 
+HELLOW
 
 
 
