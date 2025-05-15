@@ -98,7 +98,7 @@
 
 \section{Introduction}
 
-Due in part to public policy, average fine particulate matter (PM\textsubscript{2.5}) levels in the United States have declined over recent decades \cite{clean_air_act}. However, from 2010 to 2020, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations more than doubled, accounting for up to half of total PM\textsubscript{2.5} exposure in Western U.S. \cite{smoke_PM}. This is particularly concerning, as ambient PM\textsubscript{2.5} is a leading environmental risk factor for adverse health outcomes and premature mortality \cite{smoke_mortality}. These trends/risks highlight the urgent need for scalable and timely smoke monitoring systems to mitigate public health risks.
+Due in part to public policy, average fine particulate matter (PM\textsubscript{2.5}) levels in the United States have declined over recent decades \cite{clean_air_act}. However, from 2010 to 2020, the contribution of wildfire smoke to PM\textsubscript{2.5} concentrations more than doubled, accounting for up to half of total PM\textsubscript{2.5} exposure in Western United States \cite{smoke_PM}. This is particularly concerning, as ambient PM\textsubscript{2.5} is a leading environmental risk factor for adverse health outcomes and premature mortality \cite{smoke_mortality}. These trends/risks highlight the urgent need for scalable and timely smoke monitoring systems to mitigate public health risks.
 
 Satellite imagery offers the spatial coverage and temporal frequency needed for large-scale smoke monitoring. In comparison to polar-orbiting satellites like Suomi or Sentinel, geostationary satellites such as the GOES series \cite{goes} are especially well-suited to this task, providing persistent observation over fixed regions, essential for capturing the dynamic behavior of wildfire smoke plumes. The high temporal resolution and wide coverage of GOES imagery enable real-time tracking of smoke concentration and movement, supporting air quality assessments and early warning systems.
 
@@ -285,7 +285,7 @@ We evaluate the performance of \(f_{\circ}\) and \(f_c\) using Intersection over
 
 As shown in Table \ref{iou_results}, in terms of IoU, \(f_c\), that was trained on \(\mathcal{D}_p\), consistently outperform \(f_{\circ}\), that was trained on \( \mathcal{D}_M \), across all smoke density categories. For both \(f_{\circ}\) and \(f_c\), IoU improves when evaluated on \(\mathcal{D}_p\). The highest overall IoU \(= 0.5250 \), is achieved by \( f_c \) on \( \mathcal{D}_p \), indicating that PLDR improves image-label alignment and reduces training noise.
 
-Precision remains relatively consistent between models, both \( f_{\circ} \) and \( f_c \) achieve precision \(\approx 0.69 \) on \( \mathcal{D}_M \), and precision \(\approx 0.79 \) on \( \mathcal{D}_p \). This improvment between datasets but not between models suggest that \(\mathcal{D}_p\)'s test set may contain fewer samples where the image contains pixels of true smoke that the label states are not smoke. In contrast, recall improves substantially with PLDR refinement: for \( f_{\circ}\), recall increases from recall \( = 0.4098 \) on \( \mathcal{D}_M \) to \( 0.5121 \) on \( \mathcal{D}_p \); for \( f_c \), it improves from \( 0.4706 \) to \( 0.6098 \). These results demonstrate that training on \(\mathcal{D}_p\) rather than \(\mathcal{D}_M\) increases the model’s ability to detect existing wildfire plumes while maintaining a low false detection rate.
+Precision remains relatively consistent between models, both \( f_{\circ} \) and \( f_c \) achieve precision \(\approx 0.69 \) on \( \mathcal{D}_M \), and precision \(\approx 0.79 \) on \( \mathcal{D}_p \). The improvment between datasets but not between models suggest that \(\mathcal{D}_p\)'s test set may contain fewer samples where the image contains pixels of true smoke that the label states are not smoke. In contrast, recall improves substantially with PLDR refinement: for \( f_{\circ}\), recall increases from recall \( = 0.4098 \) on \( \mathcal{D}_M \) to \( 0.5121 \) on \( \mathcal{D}_p \); for \( f_c \), it improves from \( 0.4706 \) to \( 0.6098 \). These results demonstrate that training on \(\mathcal{D}_p\) rather than \(\mathcal{D}_M\) increases the model’s ability to detect existing wildfire plumes while maintaining a low false detection rate.
 
 Figure \ref{ml_vs_mei} illustrates a case in which the PLDR-selected frame better represents the HMS annotation than the Mie-derived selection. Here, the heavy smoke IoU improves from 0.01 to 0.59. While the Mie-derived image is selected based on its proximity to sunrise, PLDR chooses the frame with the highest overlap between the model-generated intermediary pseudo-label and the analyst annotation. This example highlights PLDR’s advantage in resolving temporal ambiguity.
 
@@ -326,6 +326,30 @@ To benchmark performance across segmentation architectures, we evaluate several 
     \caption{Examples of HMS annotations (top row) vs \(f_{c}\) output (bottom row) on \(\mathcal{D}_{p}\) samples. The overall IoU score is reported at the bottom of each column.}\label{examples}
 \end{figure}
 
+
+
+
+Figures \ref{monthly} and \ref{region} give statistical information on SmokeViz as well as highlight the possible influence of agricultural burns on the dataset distribution and model performance. Figure \ref{monthly} shows that sample counts in \(\mathcal{D}_p\) peak in March and April, corresponding to agricultural burning rather than wildfire activity. During these months, IoU performance is lower, while the highest scores are observed from May through September, aligning with peak wildfire activity. Figure \ref{region} further supports this trend, showing that the southeastern (SE) quadrant, where agricultural burns are prevalent, contributes 55\% of all samples but exhibits the lowest IoU performance. These patterns suggest that agricultural burns, which are typically smaller in spatial extent and less visually distinct than large wildfires, present a greater challenge for accurate detection and segmentation by the model.
+
+\begin{figure}[!htb]
+    \parbox{\textwidth}{
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{figures/combined_plot.png}
+        \label{monthly}
+        \caption{Monthly distribution of samples in the full dataset \( \mathcal{D}_p \) (left), and monthly IoU scores between \(f_c\) predictions and analyst annotations on the \(\mathcal{D}_p\) test set (right).}
+      }
+    \hspace{0.01\textwidth}
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{figures/sample_count_per_state_with_regions.png}
+        \caption{Sample percent contribution by region in the full \( \mathcal{D}_p \) dataset and IoU performance of \(f_c\) on the \(\mathcal{D}_p\) test set across quadrants centered at (\(40^{\circ}\text{N}, -105^{\circ}\text{W}\)).}
+          \label{region}
+      }
+    }
+\end{figure}
+
+
 \section{Limitations}
 
 More discussion and analysis on the two primary limitations can be found in the Supplementary Materials. First, pseudo-labeling methods may propagate biases from the parent model into downstream models. In our case, the increased detectability of forward-scattered light from smoke particulates may bias the model toward higher performance at larger solar zenith angles. Second, the HMS annotations do not distinguish between fire types and include a large number of controlled agricultural burns, which may limit the dataset’s applicability for targeting large-scale wildfires.
@@ -338,7 +362,6 @@ In this study, we present \textbf{SmokeViz}, a refined satellite imagery dataset
 
 
 SmokeViz serves as a robust and representative dataset for training models to detect wildfire smoke in GOES imagery at the frame level. In addition to supporting real-time smoke segmentation, this dataset has potential applications in early wildfire detection, air quality monitoring, and as a smoke analysis product for data assimilation into dispersion models. It also provides a challenging benchmark for remote sensing models tasked with segmenting diffuse, low-contrast features like smoke. More generally, this work illustrates how PLDR can be used to resolve resolution mismatches between data and labels, especially in settings with time-series or video data paired with coarse annotations. The dataset is publicly available at \url{https://noaa-gsl-experimental-pds.s3.amazonaws.com/index.html#SmokeViz/} with code available at \url{https://github.com/anonymous-smokeviz/SmokeViz}. 
-HELLOW
 
 
 
