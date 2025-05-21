@@ -96,111 +96,66 @@
 
 \section{Supplementary Material}
 
-\subsection{Original Data and Software Licenses}
+\section{A. Original Data and Software Licenses}
 
-The HMS Smoke product does not have a license attached to it. For GOES imagery, NOAA states "There are no restrictions on the use of this data" and does not provide a license. Pytroll is distributed under the GNU General Public License v3.0 license and Segmentation Models Pytorch is distributed under the MIT License.
+The HMS smoke product does not have a license attached to it. For GOES imagery, NOAA states: \emph{"There are no restrictions on the use of this data"}. PyTroll is distributed under the GNU General Public License v3.0, and Segmentation Models PyTorch is distributed under the MIT License.
+
+\section{B. Satellite and Band Selection}
 
 
-\subsection{Satellite and Band Choice}
+As described in the main paper, Advanced Baseline Imager (ABI) bands 1-3 were selected for their high signal-to-noise ratio (SNR) and relevance to visible smoke. Figure \ref{G16_vs_G17} shows an example of GOES-West provides higher visibility of a smoke plume than GOES-East near sunrise. This effect is consistent with Mie scattering physics, where forward-scattered light enhances contrast for aerosols like smoke under favorable solar geometry.
+
+\setcounter{figure}{9}
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{figures/G17_s20221371250321_35.61_-105.01_36.png}
-    \caption{GOES-West better}\label{G16_vs_G17}
+    \caption{(a) True color GOES-EAST (top) and GOES-WEST (bottom) imagery from May \(18^{th}\), 2022 centered at (\(35.6^{\circ}\), \(-105.0^{\circ}\)) in New Mexico, USA taken at 12:50 UTC. The GOES-East and West raw band imagery for (c) blue, (d) red and (e) veggie bands show variations in the SNR for smoke detection in relation to the \(\lambda\) of light being measured.}\label{G16_vs_G17}
 \end{figure}
+
+Figure \ref{all_bands} presents a smoke plume in a cloudy scene across all 16 ABI bands described in Table \ref{band_table}. The smoke signal is prominent in Bands 1–3 but diminishes in subsequent NIR channels. Band C07 (3.9 \(\mu\)m), which is sensitive to thermal anomalies, shows a strong fire signal at the source of the plume. While useful for active fire detection, including C07 for smoke segmentation may bias models toward learning fire-smoke co-location, reducing generalization to detached or low opacity smoke plumes, especially those classified as light density that have traveled far from the source. This concern supports the decision to limit input channels in SmokeViz to those that reflect the analyst operational view while minimizing potential modeling shortcuts and dataset size. The SmokeViz dataset development code is designed to be easily adapted to incorporate any desired spectral bands and/or composites.
 
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{figures/G16_s20221550056176_33_-106_all_band.png}
-    \caption{All 16 GOES bands}\label{all_bands}
+    \caption{GOES-EAST imagery for all 16 bands from June \(5^{th}\), 2022 centered at (\(33.0^{\circ}\), \(-106.0^{\circ}\)) in New Mexico, USA taken at 00:56 UTC.}\label{all_bands}
 \end{figure}
 
-\subsection{Statistical Visualizations for SmokeViz Dataset}
-
-%Figures \ref{count_per_yr}, \ref{count_per_month}, \ref{count_per_state}, \ref{count_per_country} provide some statistical analysis on \(\mathcal{D}_p\)
-Figures \ref{count_per_yr}-\ref{count_per_country} provide some statistical analysis on the SmokeViz dataset. As seen in figure \ref{count_per_yr}, we see the highest number of samples for the year 2020 that showed a high volume of available annotations that year likely due to the large number of wildfires \cite{fires2020} during 2020. The peak for number of samples shown in figure \ref{count_per_month} is March and April, coming right before the typical wildfire season that usually goes from late Spring through Fall. This may be due to the increase in prescribed agricultural burns before plants emerge from winter dormancy \cite{ag_fire}. The HMS analysts do not distinguish between planned or uncontrolled fire, so many of the annotations represent small agricultural burns along with wildfires. If a SmokeViz user desired to only have wildfires represented, they could filter out any fires that are less than one day since controlled agricultural burns tend to be shorter in timespan.
-
-As shown in figure \ref{count_per_state}, the states with the highest number of samples are California, Georgia and Florida. The high frequency in fires in the Southeast may be due to the aforemetioned prescirbed agricultural burns. Analysts are looking not only at the United States, but also Canada and Mexico, figure \ref{count_per_country} shows a breakdown of the number of samples that originate from each country.
-
-
-\begin{figure}[!htb]
-    \parbox{\textwidth}{
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_per_yr_percentages.png}
-        \caption{Sample count per year for the SmokeViz dataset broken up by smoke density with percent of each density reported within the column.}
-        \label{count_per_yr}
-      }
-    \hspace{0.01\textwidth}
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_percent_country.png}
-        \caption{Fraction of samples where the center pixel is within the bounds of each country. The counts per country are Canada: 18461, USA: 115,311 and Mexico: 25,014, 24,886 samples have center pixels over other countries/oceans.}
-        \label{count_per_country}
-      }
-    }
-\end{figure}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\linewidth]{stat_figs/sample_count_vs_diff_frames.png}
-    \caption{The number of satellite frame difference between the \(\mathcal{D}_M\) satellite image and \(\mathcal{D}_p\) chosen satellite image. GOES Full disk images are generated on 10 minute intervals. The number of samples that use the same satellite image in both datasets was 36,608 (\(\approx\)20\%).}\label{all_bands}
-\end{figure}
-
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\linewidth]{stat_figs/sample_count_vs_frames.png}
-    \caption{The number of annotations that span a number of satellite frames that are generated at a 10-minute interval.}\label{all_bands}
-\end{figure}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\linewidth]{stat_figs/satellite_test_full_dataset.png}
-    \caption{The SmokeViz test set (left) and full SmokeViz dataset (right) distributions by observational satellite.}\label{all_bands}
-\end{figure}
-
-\subsection{Model Performance Analysis}
-
-In order to get a better understanding of the dataset, we use the deep learning models to analyze certain data characteristics. Figure \ref{count_per_month} shows variations in overall IoU values running \(f_{c}\) on the \(\mathcal{D}_p\) test set data. The highest IoU are during the typical wildfire season and outside the typical window for prescribed agricultural burns. 
-
-We report on how many samples come from each satellite in table \ref{sample_count_sat}, along with the \(\mathcal{D}_p\) test set IoU in comparison to the HMS analyst annotations. While GOES-EAST provides over triple the number of training samples, \(f_c\) performs better on GOES-WEST samples out of the test set. The signal observed by a single satellite vary diurnally and annually in the amount of atmospheric noise and solar radiation. In turn, if provided with enough samples, this could create a more robust and generalizable model to the extent of being able to perform well on two different sensors with varying calibrations and line of sights. 
-
-As mentioned in the limitations, there may have been a bias introduced towards correctly classifying imagery close to sunrise or sunset. This bias may not only be introduced by our Mie-derived dataset that was used to train \(f_{\circ}\), but also in the original HMS annotations. The configuration of the sun, smoke and satellite give the highest signal-to-noise ratio at the times near the sunrise and sunset, making smoke more easily observable. In contrast, the diurnal variations of wildfires cause the fire radiative power to be highest around solar noon \cite{diurnal}. Table \ref{two_hr_iou} shows how the IoU between \(f_c\) predictions and analyst annotations for the test data from either \(\mathcal{D}_M\) or \(\mathcal{D}_p\) vary based on proximity to sunset/sunrise. One explanation for better values for midday samples could be due to higher amounts of fire activity midday and higher amounts of atmospheric interaction noise early/late in the day. Another difference we see from table \ref{two_hr_iou} is the split of closer to daylight boundaries is shifted towards midday between \(\mathcal{D}_M\) to \(\mathcal{D}_p\). This is because, for \(\mathcal{D}_p\), we are choosing the imagery with the best overlap to the analyst product rather than the image from \(\mathcal{D}_M\) that optimized for highest possible signal-to-noise ratio if given constant signal.
-
-In order to observe geographical regional variations we create quadrants, Northwest (NW), Southwest (SW), Northeast (NE) and Southeast (SE) in relation to the midpoint (40, -105) and show the sample distribution and model performance for each region in table \ref{quad}. The table shows the worst \(f_c\) performance in the SE quadrant despite representing this largest fraction of the training data. This is likely due to the large number of aforementioned prescribed burns in that area. If the goal of the dataset is to be used to train a model to detect and monitor large wildfires, a weakness in the dataset would be that it likely consists of a lot more small, controlled agricultural burns that aren't representative of the intended task. 
-
-
-\begin{table}
-    \caption{Sample count along with variations in \(f_c\) performance depending on which GOES satellite data is used.}
-  \label{sample_count_sat}
-  \centering
-  \begin{tabular}{llll}
-    \toprule
-    Satellite & Test IoU & \(\mathcal{D}_p\) Test Samples & \(\mathcal{D}_p\) Samples \\
-    \midrule
-    GOES-WEST & 0.5692 & 6355 & 40032\\
-    GOES-EAST & 0.3572 & 13869 & 143640\\
-    \bottomrule
-  \end{tabular}
+\begin{table}[!htb]
+\centering
+\caption{The GOES-Series Advanced Baseline Imager (ABI) provides data at 16 channels that cover visible (C01-C02), near-IR (C03-C06) and IR (C07-C16) bands.}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Band} & \textbf{Description} & \textbf{Center Wavelength (\(\mu\)m)} & \textbf{Spatial Resolution (km)} \\
+\midrule
+C01  & Blue visible                & 0.47     & 1   \\
+C02  & Red visible                 & 0.64     & 0.5 \\
+C03  & Veggie near IR             & 0.865    & 1   \\
+C04  & Cirrus                     & 1.378    & 2   \\
+C05  & Snow/Ice                   & 1.61     & 1   \\
+C06  & Cloud particle             & 2.24     & 2   \\
+C07  & Shortwave IR               & 3.9      & 2   \\
+C08  & Upper-level water vapor    & 6.2      & 2   \\
+C09  & Mid-level water vapor      & 6.9      & 2   \\
+C10  & Lower-level water vapor    & 7.3      & 2   \\
+C11  & IR cloud phase             & 8.5      & 2   \\
+C12  & Ozone                      & 9.6      & 2   \\
+C13  & Clean longwave IR          & 10.35    & 2   \\
+C14  & Longwave IR                & 11.2     & 2   \\
+C15  & Dirty longwave IR          & 12.3     & 2   \\
+C16  & CO\(_2\)                         & 13.3     & 2   \\
+\bottomrule
+\end{tabular}
+\label{band_table}
 \end{table}
 
 
-\begin{table*}
-    \caption{Variations in \(f_c\) performance depending on temporal proximity to sunrise or sunset.}
-  \label{two_hr_iou}
-  \centering
-  \begin{tabular}{lllll}
-    \toprule
-    Time difference & \(\mathcal{D}_M\) Test Set IoU & \(\mathcal{D}_p\) Test Set IoU & \(\mathcal{D}_M\) Test Samples & \(\mathcal{D}_p\) Test Samples \\ 
-    \midrule
-    \(<2\) hours & 0.389 & 0.578 & 14100 (65\%) & 8906 (46\%)\\
-    \(>2\) hours & 0.492 & 0.606 & 7441 (35\%) &  11318 (54\%) \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
+\subsection{Agricultural Burns}
 
+As shown in Figure \ref{count_per_yr}, the highest number of samples occurs in the year 2020, which corresponds with a record-breaking wildfire season in North America \cite{fires2020}. The monthly peak in sample counts, discussed in the main text (Figure 6), appears in March and April, prior to the typical wildfire season that spans late spring through fall. This early peak is likely driven by prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Figure 6 from the main text also shows variations in overall IoU values running \(f_{c}\) on the \(\mathcal{D}_p\) test set data per month. The highest IoU values are during the typical wildfire season and outside the typical window for prescribed agricultural burns. In addition, Figure 7 from the main text shows that the highest sample counts occur in California, Georgia, and Florida. The elevated number of annotations in southeastern states may be explained by the prevalence of agricultural burns in that region. Since HMS annotations do not differentiate between prescribed burns and wildfires, the dataset includes both event types. Users interested in isolating wildfire events may consider filtering out short-duration annotations (e.g., those lasting only a single day), though this may be complicated by variability in analyst-defined time windows and annotation frequency per fire.
+
+In order to observe geographical regional variations we create quadrants, Northwest (NW), Southwest (SW), Northeast (NE) and Southeast (SE) in relation to the midpoint (40, -105) and show the sample distribution and model performance for each region in table \ref{quad}. The table shows the worst \(f_c\) performance in the SE quadrant despite representing this largest fraction of the training data. This is likely due to the large number of aforementioned prescribed burns in that area. If the goal of the dataset is to be used to train a model to detect and monitor large wildfires, a weakness in the dataset would be that it likely consists of a lot more small, controlled agricultural burns that aren't representative of the intended task. 
 
 \begin{table}
     \caption{Along with sample count we show variations in \(f_{c}\) performance depending on quadrant.}
@@ -210,13 +165,77 @@ In order to observe geographical regional variations we create quadrants, Northw
     \toprule
     Quadrant & \(\mathcal{D}_p\) Test IoU & \(\mathcal{D}_p\) Test Samples & \(\mathcal{D}_p\) Samples \\
     \midrule
-    NW & 0.6418 & 4177 & 32792\\
-    SW & 0.6070 & 1937 & 34267\\
-    NE & 0.6811 & 1133   & 13342\\
-    SE & 0.5581 & 12977 & 103271 \\
+    NW & 0.5887 & 4177 & 32792\\
+    SW & 0.4590 & 1937 & 34267\\
+    NE & 0.5822 & 1133   & 13342\\
+    SE & 0.4798 & 12977 & 103271 \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+
+\begin{figure}[!htb]
+    \parbox{\textwidth}{
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_per_yr_percentages.png}
+        \caption{Annual sample counts in the SmokeViz dataset, broken down by smoke density class. Percentages within each column indicate the relative frequency of each density level for that year.}
+        \label{count_per_yr}
+      }
+    \hspace{0.01\textwidth}
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_percent_country.png}
+        \caption{Proportion of samples in the SmokeViz dataset whose center pixel falls within Canada, the U.S.A., or Mexico. Sample counts are: Canada: 18,461; U.S.: 115,311; Mexico: 25,014. An additional 24,886 samples are centered over other countries or oceans.}
+        \label{count_per_country}
+      }
+    }
+\end{figure}
+
+Figures \ref{count_per_yr} and \ref{count_per_country} present descriptive statistics on the composition of the SmokeViz dataset. 
+
+Importantly, SmokeViz includes annotations across North America, Figure \ref{count_per_country} summarizes the dataset's geographic coverage by country, including the United States, Canada, and Mexico.
+
+\begin{figure}[!htb]
+    \parbox{\textwidth}{
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_frames.png}
+        \caption{The number of annotations that span a number of satellite frames that are generated at a 10-minute interval.}
+        \label{num_frames}
+      }
+    \hspace{0.01\textwidth}
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_diff_frames.png}
+        \caption{The number of satellite frame difference between the \(\mathcal{D}_M\) satellite image and \(\mathcal{D}_p\) chosen satellite image. GOES Full disk images are generated on 10 minute intervals. The number of samples that use the same satellite image in both datasets was 36,608 (\(\approx\)20\%).}
+        \label{frame_diff}
+      }
+    }
+\end{figure}
+
+
+\subsection{Additional Model Performance Analysis}
+
+In order to get a better understanding of the dataset, we use the deep learning models to analyze certain data characteristics. 
+
+We report on how many samples come from each satellite in Figure \ref{sat_dataset}, along with the \(\mathcal{D}_p\) test set IoU. While GOES-EAST provides over triple the number of training samples, \(f_c\) performs better on GOES-WEST samples out of the test set. The signal observed by a single satellite vary diurnally and annually in the amount of atmospheric noise and solar radiation. In turn, if provided with enough samples, this could create a more robust and generalizable model to the extent of being able to perform well on two different sensors with varying calibrations and line of sights. Note that on June 18, 2022, GOES-West switch from operational satellite GOES-17 to the new satellelite GOES-18 satellite. The overall IoU from GOES-17 to GOES-18 is 0.6262 to 0.5852. Training data from 2018-2021 used GOES-17 only training data from 2024 includes GOES-18, so it makes sense that GOES-18 would perform worse than GOES-17. 
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\linewidth]{stat_figs/satellite_test_full_dataset.png}
+    \caption{The SmokeViz test set (left) and full SmokeViz dataset (right) distributions by observational satellite.}
+    \label{sat_dataset}
+\end{figure}
+
+As mentioned in the limitations, there may have been a bias introduced towards correctly classifying imagery close to sunrise or sunset. This bias may not only be introduced by our Mie-derived dataset that was used to train \(f_{\circ}\), but also in the original HMS annotations. The configuration of the sun, smoke and satellite give the highest signal-to-noise ratio at the times near the sunrise and sunset, making smoke more easily observable. In contrast, the diurnal variations of wildfires cause the fire radiative power to be highest around solar noon \cite{diurnal}. Table \ref{two_hr_iou} shows how the IoU between \(f_c\) predictions and analyst annotations for the test data from either \(\mathcal{D}_M\) or \(\mathcal{D}_p\) vary based on proximity to sunset/sunrise. One explanation for better values for midday samples could be due to higher amounts of fire activity midday and higher amounts of atmospheric interaction noise early/late in the day. Another difference we see from table \ref{two_hr_iou} is the split of closer to daylight boundaries is shifted towards midday between \(\mathcal{D}_M\) to \(\mathcal{D}_p\). This is because, for \(\mathcal{D}_p\), we are choosing the imagery with the best overlap to the analyst product rather than the image from \(\mathcal{D}_M\) that optimized for highest possible signal-to-noise ratio if given constant signal.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\linewidth]{stat_figs/Mie_vs_PL_midday.png}
+    \caption{Mie Derived dataset vs SmokeViz test sets with IoU}
+    \label{DM_vs_DP}
+\end{figure}
 
 \subsection{Qualitative Analysis on Performance}
 
@@ -240,7 +259,23 @@ Figure \ref{poor} gives some examples of when SmokeViz does not perform well in 
 
 \subsection{Machine Learning Reproducibility}
 
-All relevant code is accessible at \url{https://github.com/anonymous-smokeviz/SmokeViz}. The models presented in this paper are not optimized for performance, but are intended to create sufficient pseudo-labels to develop the SmokeViz dataset and then compare the performance of SmokeViz against the original dataset. Due to limited computational resources, we did not perform experimentation for deciding on architecture or hyperparameters shown in table \ref{hyper}, but did make educated decisions. We chose DeepLabV3+ because smoke varies in scale and the DeepLabV3+ backbone uses a atrous spatial pyramid pooling module that allows for varying scales of the same type of object. We use the Adam optimizer that will adapt the learning rate during training and is suited for problems with large amounts of data. Batch size was chosen due to the necessity to run the model on limited resources. 
+All relevant code is accessible at \url{https://github.com/anonymous-smokeviz/SmokeViz}. The models presented in this paper are not optimized for performance, but are intended to create sufficient pseudo-labels to develop the SmokeViz dataset and then compare the performance of SmokeViz against the original dataset. The child model used in the PLDR process was chosen by running the models shown in table \ref{child} on the Mie-derived dataset and choosing the model with the highest IoU. The hyperparameters used in for the models are shown in table \ref{hyper}. We use the Adam optimizer that will adapt the learning rate during training and is suited for problems with large amounts of data. Batch size was chosen due to the necessity to run the model on limited resources. 
+
+\begin{table}[!htb] 
+    \caption{Comparison of segmentation model IoU metrics on the Mie-Derived dataset. Based on the IoU results, the first column that uses EfficientNet and PSPNet was used as for \(f_{\circ}\).}\label{child}
+    \centering
+    \begin{tabular}{lccccc}
+        \toprule
+        \textbf{encoder} & EfficientNet\cite{efficientnetv2} & \cite{efficientnetv2} & EfficientViT\cite{efficientvit} & \cite{efficientvit}& ViT \cite{vit} \\
+        \textbf{decoder} &  PSPNet\cite{pspnet} & DeepLabV3+\cite{deeplab} & Segformer\cite{segformer} & UperNet \cite{upernet}& DPT\cite{dpt} \\
+        \midrule
+        Heavy   &	\textbf{0.3221}	& 0.2893	&	0.2185	&	0.3099	&	0.2466 \\
+        Medium  &	\textbf{0.4288}	& 0.4091	&	0.3977	&   0.4041	&	0.3135 \\
+        Light   &	\textbf{0.5044}	& 0.4424	&	0.4331	&	0.4274	&	0.4964 \\
+        Overall &	\textbf{0.4677}	& 0.4172	&   0.4054	&	0.4098	&	0.4331 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \begin{table}
     \caption{Hyperparameters used to create \(f_{\circ}\) and \(f_{c}\).}
@@ -259,252 +294,7 @@ All relevant code is accessible at \url{https://github.com/anonymous-smokeviz/Sm
 \end{table}
 
 
+\bibliography{references}
+\end{document}
 \pagebreak
 
-\subsection{Datasheet for SmokeViz}
-
-Questions from the https://arxiv.org/abs/1803.09010 paper, v7.
-
-\subsubsection{Motivation}
-
-The questions in this section are primarily intended to encourage dataset creators to clearly articulate their reasons for creating the dataset and to promote transparencyabout funding interests.
-
-\textbf{For what purpose was the dataset created? }
-
-SmokeViz was created to serve as a large labeled dataset to be used in creating wildfire smoke plume related machine learning models. Applications include wildfire smoke detection or smoke dispersion modeling.
-
-\textbf{Who created the dataset (e.g., which team, research group) and on behalf of which entity (e.g., company, institution, organization)?}
-
-REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{Who funded the creation of the dataset?} 
-
-REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{Any other comments?}
-
-None.
-
-\subsubsection{Composition}
-
-Most of these questions are intended to provide dataset consumers with the information they need to make informed decisions about using the dataset for specific tasks. The answers to some of these questions reveal information about compliance with the EU’s General Data Protection Regulation (GDPR) or comparable regulations in other jurisdictions.
-
-\textbf{What do the instances that comprise the dataset represent (e.g., documents, photos, people, countries)?}
-
-Each instance is a 256x256x3 RGB image from GOES imagery with an accompanying 256x256x3 binary masks corresponding to density of smoke. There are 3 densities of smoke - Light, Medium and Heavy.
-
-
-\textbf{How many instances are there in total (of each type, if appropriate)?} 
-
-There are 183,672 samples - 128,755 for light, 35,710 for medium and 19,207 for heavy density smoke.
-
-
-\textbf{Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set? }
-
-The entire possible number of samples between 2018/01/01 - 2024/11/01 is 210,702. The dataset is reduced to 207,106 samples after filtering out any samples with no corresponding satellite imagery available or imagery that is less than 10 or over 90 percent saturation. Total saturation is defined when each pixel is equal to 1. Mentioned in more detail in the paper, the dataset was further reduced down to 183,672 samples after applying a .01 IoU threshold during the pseudo-labeling process.
-
-\textbf{What data does each instance consist of? }
-
-The data is processed to correct for Rayleigh scattering, solar zenith angle and projected so each pixel is representative of the same area of land. The algorithm is referenced in the SmokeViz paper.
-
-\textbf{Is there a label or target associated with each instance?}
-
-Yes, there are no samples that are intended to not display any smoke.
-
-\textbf{Is any information missing from individual instances?}
-
-We have seen imagery where smoke is labeled but there's adjacent smoke plumes that were unlabeled. With human labels comes human errors.
-
-\textbf{Are relationships between individual instances made explicit (e.g., users’ movie ratings, social network links)?}
-
-Some instances can overap in geographic location, there can be multiple smoke plumes in one instance, but the index of the HMS smoke annotation is listed and can be mapped back to the original dataset for geolocational information.
-
-\textbf{Are there recommended data splits (e.g., training, development/validation, testing)?}
-
-We recommend using full years of data for training, validation and testing to keep full year long patterns of wildfire behavior. We use 2018-2021 and 2024 for training, 2023 for validation and 2022 for testing.
-
-\textbf{Are there any errors, sources of noise, or redundancies in the dataset?}
-
-The HMS smoke annotations that are used as truth are a source of noise as explained in the SmokeViz paper. These include approximations of smoke polygons mismatching actual location and time windows being too large that smoke moves during the time window. There is also noise caused by atmospheric interactions with light. Redundancies occur when there more than one smoke plume and annotation in one image.
-
-\textbf{Is the dataset self-contained, or does it link to or otherwise rely on external resources (e.g., websites, tweets, other datasets)?}
-
-The dataset is self-contained.
-
-\textbf{Does the dataset contain data that might be considered confidential (e.g., data that is protected by legal privilege or by doctor-patient confidentiality, data that includes the content of individuals’ non-public communications)?}
-
-No.
-
-\textbf{Does the dataset contain data that, if viewed directly, might be offensive, insulting, threatening, or might otherwise cause anxiety?}
-
-No.
-
-\textbf{Does the dataset relate to people? }
-
-No, not directly, although wildfires do affect people, these images are at 1km resolution and do not show enough detail to relate to people or infrastructure.
-
-\textbf{Does the dataset identify any subpopulations (e.g., by age, gender)?}
-
-No.
-
-\textbf{Is it possible to identify individuals (i.e., one or more natural persons), either directly or indirectly (i.e., in combination with other data) from the dataset?}
-
-No.
-
-\textbf{Does the dataset contain data that might be considered sensitive in any way (e.g., data that reveals racial or ethnic origins, sexual orientations, religious beliefs, political opinions or union memberships, or locations; financial or health data; biometric or genetic data; forms of government identification, such as social security numbers; criminal history)?}
-
-No.
-
-\textbf{Any other comments?}
-
-No.
-
-
-\subsubsection{Collection process}
-
-The answers to questions here may provide information that allow others to reconstruct the dataset without access to it.
-
-\textbf{How was the data associated with each instance acquired?}
-
-The labels from HMS smoke product are not validated or verified but is used for AirNow air quality assessments. The GOES imagery is collected by the ABI sensor and is corrected for any anomalies and also converted from photon count to radiance values.
-
-\textbf{What mechanisms or procedures were used to collect the data (e.g., hardware apparatus or sensor, manual human curation, software program, software API)?}
-
-Original low temporal resolution annotations were manual human analyst curated. To create the high temporal resolution annotations, we use pseudo-labeling discussed in detail within the SmokeViz paper.
-
-\textbf{If the dataset is a sample from a larger set, what was the sampling strategy (e.g., deterministic, probabilistic with specific sampling probabilities)?}
-
-The HMS smoke analysts are only looking for smoke during the daytime and do avoid annotations during heavy cloud cover.
-
-\textbf{Who was involved in the data collection process (e.g., students, crowdworkers, contractors) and how were they compensated (e.g., how much were crowdworkers paid)?}
-
-The NOAA NESDIS employed analysts are compensated as salaried federal employees.
-
-\textbf{Over what timeframe was the data collected?}
-
-2018-2024
-
-\textbf{Were any ethical review processes conducted (e.g., by an institutional review board)?}
-
-No.
-
-
-\subsubsection{Preprocessing/cleaning/labeling}
-
-
-The questions in this section are intended to provide dataset consumers with the information they need to determine whether the “raw” data has been processed in ways that are compatible with their chosen tasks. For example, text that has been converted into a “bag-of-words” is not suitable for tasks involving word order.
-
-\textbf{Was any preprocessing/cleaning/labeling of the data done (e.g., discretization or bucketing, tokenization, part-of-speech tagging, SIFT feature extraction, removal of instances, processing of missing values)?}
-
-The data was processed according to the GOES True Color paper referenced in the SmokeViz methods section. This includes atmospheric, Rayleigh corrections and estimation of a Green band.
-
-\textbf{Was the “raw” data saved in addition to the preprocessed/cleaned/labeled data (e.g., to support unanticipated future uses)?}
-
-The raw data is available from the NOAA AWS webpage.
-https://registry.opendata.aws/noaa-goes/
-The HMS smoke annotations are available here:
-https://www.ospo.noaa.gov/products/land/hms.html
-
-\textbf{Is the software used to preprocess/clean/label the instances available?}
-
-
-Yes, Pytroll implements the algorithm discussed in the GOES True Color paper referenced in the SmokeViz paper.
-
-\textbf{Any other comments?}
-None.
-
-\subsubsection{Uses}
-
-These questions are intended to encourage dataset creators to reflect on the tasks for which the dataset should and should not be used. By explicitly highlighting these tasks, dataset creators can help dataset consumers to make informed decisions, thereby avoiding potential risks or harms.
-
-\textbf{Has the dataset been used for any tasks already?}
-
-It was used to train benchmark models mentioned in the paper that apply semantic segmentation to identify and classify smoke in satellite imagery.
-
-\textbf{Is there a repository that links to any or all papers or systems that use the dataset?}
-
-No.
-
-\textbf{What (other) tasks could the dataset be used for?}
-
-A machine learning based smoke dispersion model, automated wildfire smoke detection, create a model that will output a smoke analysis product for data assimilation into smoke or air quality models.
-
-\textbf{Is there anything about the composition of the dataset or the way it was collected and preprocessed/cleaned/labeled that might impact future uses?}
-
-No.
-
-\textbf{Are there tasks for which the dataset should not be used?}
-
-No.
-\textbf{Any other comments?}
-None
-
-\subsubsection{Distribution}
-
-\textbf{Will the dataset be distributed to third parties outside of the entity (e.g., company, institution, organization) on behalf of which the dataset was created? }
-
-No.
-
-\textbf{How will the dataset will be distributed (e.g., tarball on website, API, GitHub)?}
-
-REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{When will the dataset be distributed?}
-
-It is currently available.
-
-\textbf{Will the dataset be distributed under a copyright or other intellectual property (IP) license, and/or under applicable terms of use (ToU)?}
-
-No.
-
-\textbf{Have any third parties imposed IP-based or other restrictions on the data associated with the instances?}
-
-No.
-
-\textbf{Do any export controls or other regulatory restrictions apply to the dataset or to individual instances?}
-
-No.
-
-\textbf{Any other comments?}
-
-None.
-
-\subsubsection{Maintenance}
-
-These questions are intended to encourage dataset creators to plan for dataset maintenance
-and communicate this plan with dataset consumers.
-
-\textbf{Who is supporting/hosting/maintaining the dataset?}
-
-REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{How can the owner/curator/manager of the dataset be contacted (e.g., email address)?}
-
-REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{Is there an erratum?}
-
-No.
-
-\textbf{Will the dataset be updated (e.g., to correct labeling errors, add new instances, delete instances)?}
-
-yes
-
-\textbf{If the dataset relates to people, are there applicable limits on the retention of the data associated with the instances (e.g., were individuals in question told that their data would be retained for a fixed period of time and then deleted)?}
-
-Not applicable.
-
-\textbf{Will older versions of the dataset continue to be supported/hosted/maintained?}
-
-No, if it needs to be updated, it is too large to keep multple versions.
-
-\textbf{If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so?}
-
-We encourage anyone that would like to contribute to SmokeViz to reach out to REMOVED TO KEEP ANONYMITY DURING REVIEW PROCESS.
-
-\textbf{Any other comments?}
-
-None
-
-
-\end{document}
