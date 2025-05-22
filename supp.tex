@@ -43,7 +43,7 @@
 \newcommand\reynotes[1]{\textcolor{purple}{#1}}
 
 %\title{SmokeViz: Using Pseudo-Labels to Develop a Human-Labeled Deep Learning Dataset of Wildfire Smoke Plumes in Satellite Imagery}
-\title{SmokeViz: A Large-Scale Satellite Dataset for Wildfire Smoke Detection and Segmentation}
+\title{Supplementary Materials for SmokeViz: A Large-Scale Satellite Dataset for Wildfire Smoke Detection and Segmentation}
 
 
 % The \author macro works with any number of authors. There are two commands
@@ -91,16 +91,16 @@
 
 
 
+\maketitle
 
 \appendix
 
-\section{Supplementary Material}
 
-\section{A. Original Data and Software Licenses}
+\section{Original Data and Software Licenses}
 
 The HMS smoke product does not have a license attached to it. For GOES imagery, NOAA states: \emph{"There are no restrictions on the use of this data"}. PyTroll is distributed under the GNU General Public License v3.0, and Segmentation Models PyTorch is distributed under the MIT License.
 
-\section{B. Satellite and Band Selection}
+\section{Satellite and Band Selection}
 
 
 As described in the main paper, Advanced Baseline Imager (ABI) bands 1-3 were selected for their high signal-to-noise ratio (SNR) and relevance to visible smoke. Figure \ref{G16_vs_G17} shows an example of GOES-West provides higher visibility of a smoke plume than GOES-East near sunrise. This effect is consistent with Mie scattering physics, where forward-scattered light enhances contrast for aerosols like smoke under favorable solar geometry.
@@ -150,7 +150,7 @@ C16  & CO\(_2\)                         & 13.3     & 2   \\
 \label{band_table}
 \end{table}
 
-\subsection{Statistical Dataset Visualizations}
+\section{Statistical Dataset Visualizations}
 
 Figures \ref{num_frames}-\ref{count_per_country} summarize key statistical characteristics of the SmokeViz dataset.
 
@@ -187,7 +187,7 @@ Lastly, SmokeViz includes annotations across North America, Figure \ref{count_pe
     }
 \end{figure}
 
-\subsection{Agricultural Burns}
+\section{Agricultural Burns}
 
 The monthly peak in sample counts, shown in the main paper (Figure 6), occurs in March and April, preceding the typical wildfire season, which spans from late spring through fall. This early-season spike is likely due to prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Since HMS annotations do not distinguish between prescribed burns and wildfires, both event types are included in the dataset.
 
@@ -197,33 +197,33 @@ A spatial breakdown of sample density further supports this interpretation. Figu
 
 Table \ref{quad} reports test IoU and sample counts for each quadrant. Despite containing the largest share of training samples, the Southeast quadrant exhibits the lowest model performance. This degradation is likely due to the abundance of prescribed burns, which may produce smaller, low-opacity smoke plumes that are harder to detect. For users whose objective is to train models specifically for large wildfire detection, this highlights a limitation of the dataset: a substantial portion of the training data originates from controlled burns, which may not be representative of the intended task. One possible mitigation strategy is to filter out short-duration annotations (e.g., single-day events), though this is complicated by variability in analyst-defined time windows and labeling cadence per fire event.
 
-
-\begin{table}
-    \caption{Sample distribution and \(f_{c}\) test performance across geographic quadrants. Despite containing the most data, the Southeast (SE) region yields the lowest IoU.}
+\begin{table}[!htb]
+    \caption{SmokeViz dataset sample distribution and \(f_{c}\) test performance across geographic quadrants. Despite containing the most data, the Southeast (SE) region yields the lowest IoU.}
     \label{quad}
     \centering
-    \begin{tabular}{llll}
+    \begin{tabular}{lccc}
         \toprule
-        Quadrant & \(\mathcal{D}_p\) Test IoU & \(\mathcal{D}_p\) Test Samples & \(\mathcal{D}_p\) Samples \\
+        Quadrant & SmokeViz Test Set IoU & SmokeViz Test Set Samples & SmokeViz Samples \\
         \midrule
-        NW & 0.5887 & 4177 & 32792\\
-        SW & 0.4590 & 1937 & 34267\\
-        NE & 0.5822 & 1133   & 13342\\
-        SE & 0.4798 & 12977 & 103271 \\
+        Northwest (NW) & 0.5887 & 4,177 & 32,792 \\
+        Southwest (SW) & 0.4590 & 1,937 & 34,267 \\
+        Northeast (NE) & 0.5822 & 1,133 & 13,342 \\
+        Southeast (SE) & 0.4798 & 12,977 & 103,271 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 
 
-
-\subsection{Satellite Analysis}
+\section{Satellite Analysis}
 
 Figure \ref{sat_dataset} shows the distribution of samples from GOES-East and GOES-West in both the full SmokeViz dataset and the \(\mathcal{D}_p\) test set, along with their respective segmentation performance using \(f_c\). Although GOES-East contributes nearly three-quarters of all samples, model performance is substantially better on GOES-West test samples, with an IoU of 0.6187 compared to 0.4498 for GOES-East.
 
 This discrepancy may stem from several factors. First, the observed signal quality varies between satellites depending on diurnal lighting, seasonal solar angles, and atmospheric conditions. GOES-West best captures forward-scattered sunlight during early morning hours over the western U.S., enhancing smoke visibility via Mie scattering and possibly boosting model accuracy. Additionally, sensor calibration, viewing geometry, and line-of-sight differences between the two platforms could contribute to systematic performance variation.
 
 Another relevant factor is the operational transition between satellites. On June 18, 2022, GOES-17 was replaced by GOES-18 as the operational West satellite. While GOES-17 samples in the test set yield an IoU of 0.6262, GOES-18 samples yield a slightly lower performance at 0.5852. This is likely due to the limited exposure of GOES-18 data during model training: training years (2018–2021) include only GOES-17, while GOES-18 is only present in the 2024 training data. This temporal imbalance may partially explain the drop in IoU for GOES-18.
+
+Overall, these results suggest that while GOES-East offers broader coverage, the more favorable observational geometry of GOES-West—combined with consistent training data—produces stronger segmentation results. Future work may explore satellite-specific fine-tuning or normalization techniques to reduce these performance gaps.
 
 \begin{figure}[!htb]
     \centering
@@ -232,34 +232,48 @@ Another relevant factor is the operational transition between satellites. On Jun
     \label{sat_dataset}
 \end{figure}
 
-\subsection{Sunset/Sunrise Bias}
+\section{Sunset/Sunrise Bias}
 
-As mentioned in the limitations, there may have been a bias introduced towards correctly classifying imagery close to sunrise or sunset. This bias may not only be introduced by our Mie-derived dataset that was used to train \(f_{\circ}\), but also in the original HMS annotations. The configuration of the sun, smoke and satellite give the highest signal-to-noise ratio at the times near the sunrise and sunset, making smoke more easily observable by analysts. In contrast, the diurnal variations of wildfires cause the fire radiative power to be highest around solar noon \cite{diurnal}. Table \ref{two_hr_iou} shows how the IoU between \(f_c\) predictions and analyst annotations for the test data from either \(\mathcal{D}_M\) or \(\mathcal{D}_p\) vary based on proximity to sunset/sunrise. One explanation for better values for midday samples could be due to higher amounts of fire activity midday and higher amounts of atmospheric interaction noise early/late in the day. Another difference we see from table \ref{two_hr_iou} is the split of closer to daylight boundaries is shifted towards midday between \(\mathcal{D}_M\) to \(\mathcal{D}_p\). This is because, for \(\mathcal{D}_p\), we are choosing the imagery with the best overlap to the analyst product rather than the image from \(\mathcal{D}_M\) that optimized for highest possible signal-to-noise ratio if given constant signal.
+As discussed in the main paper's limitations, there exists a potential observational bias toward imagery captured near sunrise or sunset. This bias may originate from both our Mie-derived dataset (\(\mathcal{D}_M\)) and the original HMS annotations. Due to Mie scattering, the sun-satellite-smoke geometry results in a higher signal-to-noise ratio (SNR) when the solar zenith angle is near \(90^{\circ}\), typically around sunrise and sunset. This light configuration enhances the visual detectability of smoke plumes, guiding our initial selection method and potentially the analyst annotations.
+
+In contrast, diurnal fire activity patterns . Wildfires tend to exhibit peak fire radiative power around solar noon due to increased temperature and wind \cite{diurnal}, meaning that smoke intensity and spread are often greatest in midday imagery. The tension between observational clarity and fire behavior complicates dataset curation.
+
+Figure \ref{DM_vs_DP} compares the performance of models trained on \(\mathcal{D}_M\) (left) and the refined PLDR-generated dataset \(\mathcal{D}_p\) (right), segmented by image with temporal proximity to sunrise/sunset versus midday. The Mie-derived dataset favors high-SZA imagery, reflected in stronger IoU for morning/evening frames. In contrast, the SmokeViz dataset (\(\mathcal{D}_p\)), which selects the frame with the best overlap between model prediction and annotation, shows higher IoU for midday images, suggesting it more accurately aligns with fire dynamics rather than SNR optimization bias.
+
+This shift in temporal preference is further quantified in Figure \ref{frame_diff}, which shows the distribution of frame differences between corresponding samples in \(\mathcal{D}_M\) and \(\mathcal{D}_p\). Over 80\% of the annotations were assigned to different satellite frames between the two datasets. This illustrates the degree of temporal refinement enabled by PLDR, which prioritizes semantic alignment over SNR.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{stat_figs/Mie_vs_PL_midday.png}
-    \caption{Mie Derived dataset vs SmokeViz test sets with IoU}
+    \caption{Distribution of test set samples in the Mie-derived dataset (\(\mathcal{D}_M\), left) and SmokeViz dataset (\(\mathcal{D}_p\), right), split by time proximity to sunrise/sunset versus midday. The PLDR refinement leads to large distribution and improved performance for midday samples.}
     \label{DM_vs_DP}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
         \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_diff_frames.png}
-        \caption{The number of satellite frame difference between the \(\mathcal{D}_M\) satellite image and \(\mathcal{D}_p\) chosen satellite image. GOES Full disk images are generated on 10 minute intervals. The number of samples that use the same satellite image in both datasets was 36,608 (\(\approx\)20\%).}
+        \caption{Histogram showing the shift in satellite frame selection between the Mie-derived dataset \(\mathcal{D}_M\) and the PLDR-selected SmokeViz dataset \(\mathcal{D}_p\). A value of 0 indicates the same frame was selected. Only 20\% of samples (36,608) used the same frame, indicating substantial temporal reassignment.}
         \label{frame_diff}
 \end{figure}
 
 
 
-\subsection{Qualitative Analysis on Performance}
+\section{Qualitative Analysis on Performance}
 
 Figure \ref{poor} gives some examples of when SmokeViz does not perform well in comparison to the HMS analyst annotations. In the first column example, SmokeViz confuses a smoke-like cloud for smoke, something it generally tends to not seem to have issues with, but this is an counter example to that trend. The second through last columns all miss distinctive plumes that should be classified as either medium or heavy density smoke. In contrast, we show what SmokeViz looks like when it performs well in comparison to the HMS smoke product in figure \ref{good}.
+
+To complement the quantitative evaluation, we provide qualitative comparisons between the SmokeViz model predictions and the original HMS analyst annotations. These examples illustrate strengths and failure modes observed in the dataset.
+
+Figure \ref{poor} presents five cases where \(f_c\) does not perform optimally. In the first column, the model mistakenly identifies a smoke-like cloud as light-density smoke, a rare misclassification that reveals a potential weakness in cloud/smoke differentiation under certain lighting and texture conditions. In the remaining columns, SmokeViz underestimates the extent or density of visible smoke plumes. These errors generally occur in scenes with faint or fragmented plumes, where the signal-to-noise ratio is lower, or where overlapping atmospheric conditions make segmentation more difficult. In some cases, partial occlusion or lower contrast in the plume edges may have limited the model's confidence.
+
+In contrast, Figure \ref{good} shows examples where SmokeViz closely matches the HMS labels or even outperforms them in delineating plume boundaries. In these scenes, the model produces tighter boundaries that conform well to the visible smoke extent, including fine structural details that the coarser analyst polygons often miss.
+
+Together, these examples show that while the model performs robustly across many diverse smoke scenes, it still faces challenges in edge cases involving ambiguous cloud formations, light plumes, or visually occluded conditions. These qualitative insights can help inform aspects of improvements in future models.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{stat_figs/bad_results.png}
-    \caption{Examples of Smoke Viz performing poorly.}
+    \caption{Challenging examples where SmokeViz underperforms. Top row: HMS annotations. Bottom row: SmokeViz model predictions. Leftmost column shows a false positive (cloud misclassified as smoke), remaining examples show under-segmentation or missed detection of smoke plumes. IoU values for each column are shown below.}
     \label{poor}
 \end{figure}
 
@@ -267,12 +281,12 @@ Figure \ref{poor} gives some examples of when SmokeViz does not perform well in 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{stat_figs/good_results.png}
-    \caption{Examples of Smoke Viz performing well.}
+    \caption{Examples of successful segmentation by SmokeViz. The model predictions (bottom) align well with HMS annotations (top), capturing plume shape and density more precisely. IoU scores shown below each sample indicate high overlap.}
     \label{good}
 \end{figure}
 
 
-\subsection{Machine Learning Reproducibility}
+\section{Machine Learning Reproducibility}
 
 All relevant code is accessible at \url{https://github.com/anonymous-smokeviz/SmokeViz}. The models presented in this paper are not optimized for performance, but are intended to create sufficient pseudo-labels to develop the SmokeViz dataset and then compare the performance of SmokeViz against the original dataset. The child model used in the PLDR process was chosen by running the models shown in table \ref{child} on the Mie-derived dataset and choosing the model with the highest IoU. The hyperparameters used in for the models are shown in table \ref{hyper}. We use the Adam optimizer that will adapt the learning rate during training and is suited for problems with large amounts of data. Batch size was chosen due to the necessity to run the model on limited resources. 
 
