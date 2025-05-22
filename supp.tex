@@ -219,13 +219,16 @@ Table \ref{quad} reports test IoU and sample counts for each quadrant. Despite c
 
 \subsection{Satellite Analysis}
 
+Figure \ref{sat_dataset} shows the distribution of samples from GOES-East and GOES-West in both the full SmokeViz dataset and the \(\mathcal{D}_p\) test set, along with their respective segmentation performance using \(f_c\). Although GOES-East contributes nearly three-quarters of all samples, model performance is substantially better on GOES-West test samples, with an IoU of 0.6187 compared to 0.4498 for GOES-East.
 
-We report on how many samples come from each satellite in Figure \ref{sat_dataset}, along with the \(\mathcal{D}_p\) test set IoU. While GOES-EAST provides over triple the number of training samples, \(f_c\) performs better on GOES-WEST samples out of the test set. The signal observed by a single satellite vary diurnally and annually in the amount of atmospheric noise and solar radiation. In turn, if provided with enough samples, this could create a more robust and generalizable model to the extent of being able to perform well on two different sensors with varying calibrations and line of sights. Note that on June 18, 2022, GOES-West switch from operational satellite GOES-17 to the new satellelite GOES-18 satellite. The overall IoU from GOES-17 to GOES-18 is 0.6262 to 0.5852. Training data from 2018-2021 used GOES-17 only training data from 2024 includes GOES-18, so it makes sense that GOES-18 would perform worse than GOES-17. 
+This discrepancy may stem from several factors. First, the observed signal quality varies between satellites depending on diurnal lighting, seasonal solar angles, and atmospheric conditions. GOES-West best captures forward-scattered sunlight during early morning hours over the western U.S., enhancing smoke visibility via Mie scattering and possibly boosting model accuracy. Additionally, sensor calibration, viewing geometry, and line-of-sight differences between the two platforms could contribute to systematic performance variation.
+
+Another relevant factor is the operational transition between satellites. On June 18, 2022, GOES-17 was replaced by GOES-18 as the operational West satellite. While GOES-17 samples in the test set yield an IoU of 0.6262, GOES-18 samples yield a slightly lower performance at 0.5852. This is likely due to the limited exposure of GOES-18 data during model training: training years (2018–2021) include only GOES-17, while GOES-18 is only present in the 2024 training data. This temporal imbalance may partially explain the drop in IoU for GOES-18.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\linewidth]{stat_figs/satellite_test_full_dataset.png}
-    \caption{The SmokeViz test set (left) and full SmokeViz dataset (right) distributions by observational satellite.}
+    \caption{SmokeViz test set (left) and full dataset (right) sample distributions by satellite. GOES-West samples account for a smaller portion of the dataset but yield higher test IoU.}
     \label{sat_dataset}
 \end{figure}
 
