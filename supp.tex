@@ -189,24 +189,29 @@ Lastly, SmokeViz includes annotations across North America, Figure \ref{count_pe
 
 \subsection{Agricultural Burns}
 
-The monthly peak in sample counts, discussed in the main text (Figure 6), appears in March and April, prior to the typical wildfire season that spans late spring through fall. This early peak is likely driven by prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Figure 6 from the main text also shows variations in overall IoU values running \(f_{c}\) on the \(\mathcal{D}_p\) test set data per month. The highest IoU values are during the typical wildfire season and outside the typical window for prescribed agricultural burns. In addition, Figure 7 from the main text shows that the highest sample counts occur in California, Georgia, and Florida. The elevated number of annotations in southeastern states may be explained by the prevalence of agricultural burns in that region. Since HMS annotations do not differentiate between prescribed burns and wildfires, the dataset includes both event types. Users interested in isolating wildfire events may consider filtering out short-duration annotations (e.g., those lasting only a single day), though this may be complicated by variability in analyst-defined time windows and annotation frequency per fire.
+The monthly peak in sample counts, shown in the main paper (Figure 6), occurs in March and April, preceding the typical wildfire season, which spans from late spring through fall. This early-season spike is likely due to prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Since HMS annotations do not distinguish between prescribed burns and wildfires, both event types are included in the dataset.
 
-In order to observe geographical regional variations we create quadrants, Northwest (NW), Southwest (SW), Northeast (NE) and Southeast (SE) in relation to the midpoint (40, -105) and show the sample distribution and model performance for each region in table \ref{quad}. The table shows the worst \(f_c\) performance in the SE quadrant despite representing this largest fraction of the training data. This is likely due to the large number of aforementioned prescribed burns in that area. If the goal of the dataset is to be used to train a model to detect and monitor large wildfires, a weakness in the dataset would be that it likely consists of a lot more small, controlled agricultural burns that aren't representative of the intended task. 
+Model performance over time, also shown in Figure 6, reveals that the highest IoU values for \(f_{c}\) on the \(\mathcal{D}_p\) test set occur during the peak wildfire season (May–September), not during the months with the highest sample counts. This suggests that prescribed burns that are typically smaller and less visually distinct than large wildfires, are more difficult for the model to segment.
+
+A spatial breakdown of sample density further supports this interpretation. Figure 7 in the main paper shows that the states with the highest number of samples are California, Georgia, and Florida. The elevated sample counts in southeastern states are consistent with regional practices of frequent prescribed burns. To investigate regional effects more explicitly, we divide the dataset into four geographic quadrants—Northwest (NW), Southwest (SW), Northeast (NE), and Southeast (SE)—centered around a continental midpoint at \((40^\circ\mathrm{N}, -105^\circ\mathrm{W})\).
+
+Table \ref{quad} reports test IoU and sample counts for each quadrant. Despite containing the largest share of training samples, the Southeast quadrant exhibits the lowest model performance. This degradation is likely due to the abundance of prescribed burns, which may produce smaller, low-opacity smoke plumes that are harder to detect. For users whose objective is to train models specifically for large wildfire detection, this highlights a limitation of the dataset: a substantial portion of the training data originates from controlled burns, which may not be representative of the intended task. One possible mitigation strategy is to filter out short-duration annotations (e.g., single-day events), though this is complicated by variability in analyst-defined time windows and labeling cadence per fire event.
+
 
 \begin{table}
-    \caption{Along with sample count we show variations in \(f_{c}\) performance depending on quadrant.}
-  \label{quad}
-  \centering
-  \begin{tabular}{llll}
-    \toprule
-    Quadrant & \(\mathcal{D}_p\) Test IoU & \(\mathcal{D}_p\) Test Samples & \(\mathcal{D}_p\) Samples \\
-    \midrule
-    NW & 0.5887 & 4177 & 32792\\
-    SW & 0.4590 & 1937 & 34267\\
-    NE & 0.5822 & 1133   & 13342\\
-    SE & 0.4798 & 12977 & 103271 \\
-    \bottomrule
-  \end{tabular}
+    \caption{Sample distribution and \(f_{c}\) test performance across geographic quadrants. Despite containing the most data, the Southeast (SE) region yields the lowest IoU.}
+    \label{quad}
+    \centering
+    \begin{tabular}{llll}
+        \toprule
+        Quadrant & \(\mathcal{D}_p\) Test IoU & \(\mathcal{D}_p\) Test Samples & \(\mathcal{D}_p\) Samples \\
+        \midrule
+        NW & 0.5887 & 4177 & 32792\\
+        SW & 0.4590 & 1937 & 34267\\
+        NE & 0.5822 & 1133   & 13342\\
+        SE & 0.4798 & 12977 & 103271 \\
+        \bottomrule
+    \end{tabular}
 \end{table}
 
 
