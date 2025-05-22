@@ -150,10 +150,46 @@ C16  & CO\(_2\)                         & 13.3     & 2   \\
 \label{band_table}
 \end{table}
 
+\subsection{Statistical Dataset Visualizations}
+
+Figures \ref{num_frames}-\ref{count_per_country} summarize key statistical characteristics of the SmokeViz dataset.
+
+Figure \ref{num_frames} presents a histogram of the number of GOES satellite frames associated with each HMS annotation. Since frames are available every 10 minutes, this visualization reflects the variability in annotation time window duration. Most annotations span between 5 and 50 frames, corresponding to 50 minutes to just over 8 hours, underscoring the need for resolving temporal ambiguity during dataset refinement.
+
+Figure \ref{count_per_yr} shows the number of SmokeViz samples per year, stratified by smoke density. The year 2020 exhibits the highest sample count, aligning with an exceptionally active wildfire season across North America \cite{fires2020}. The density distribution across years also varies, with some years showing a higher relative proportion of light or medium smoke annotations.
+
+Lastly, SmokeViz includes annotations across North America, Figure \ref{count_per_country} summarizes the dataset's geographic coverage by country, including the United States, Canada, and Mexico.
+
+
+
+\begin{figure}[!htb]
+    \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_frames.png}
+        \caption{The number of annotations that span a number of satellite frames that are generated at a 10-minute interval.}
+        \label{num_frames}
+\end{figure}
+
+\begin{figure}[!htb]
+    \parbox{\textwidth}{
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_per_yr_percentages.png}
+        \caption{Annual sample counts in the SmokeViz dataset, broken down by smoke density class. Percentages within each column indicate the relative frequency of each density level for that year.}
+        \label{count_per_yr}
+      }
+    \hspace{0.01\textwidth}
+      \parbox{0.49\textwidth}{
+        \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_percent_country.png}
+        \caption{Proportion of samples in the SmokeViz dataset whose center pixel falls within Canada, the U.S.A., or Mexico. Sample counts are: Canada: 18,461; U.S.: 115,311; Mexico: 25,014. An additional 24,886 samples are centered over other countries or oceans.}
+        \label{count_per_country}
+      }
+    }
+\end{figure}
 
 \subsection{Agricultural Burns}
 
-As shown in Figure \ref{count_per_yr}, the highest number of samples occurs in the year 2020, which corresponds with a record-breaking wildfire season in North America \cite{fires2020}. The monthly peak in sample counts, discussed in the main text (Figure 6), appears in March and April, prior to the typical wildfire season that spans late spring through fall. This early peak is likely driven by prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Figure 6 from the main text also shows variations in overall IoU values running \(f_{c}\) on the \(\mathcal{D}_p\) test set data per month. The highest IoU values are during the typical wildfire season and outside the typical window for prescribed agricultural burns. In addition, Figure 7 from the main text shows that the highest sample counts occur in California, Georgia, and Florida. The elevated number of annotations in southeastern states may be explained by the prevalence of agricultural burns in that region. Since HMS annotations do not differentiate between prescribed burns and wildfires, the dataset includes both event types. Users interested in isolating wildfire events may consider filtering out short-duration annotations (e.g., those lasting only a single day), though this may be complicated by variability in analyst-defined time windows and annotation frequency per fire.
+The monthly peak in sample counts, discussed in the main text (Figure 6), appears in March and April, prior to the typical wildfire season that spans late spring through fall. This early peak is likely driven by prescribed agricultural burns, which are commonly conducted before vegetation exits winter dormancy \cite{ag_fire}. Figure 6 from the main text also shows variations in overall IoU values running \(f_{c}\) on the \(\mathcal{D}_p\) test set data per month. The highest IoU values are during the typical wildfire season and outside the typical window for prescribed agricultural burns. In addition, Figure 7 from the main text shows that the highest sample counts occur in California, Georgia, and Florida. The elevated number of annotations in southeastern states may be explained by the prevalence of agricultural burns in that region. Since HMS annotations do not differentiate between prescribed burns and wildfires, the dataset includes both event types. Users interested in isolating wildfire events may consider filtering out short-duration annotations (e.g., those lasting only a single day), though this may be complicated by variability in analyst-defined time windows and annotation frequency per fire.
 
 In order to observe geographical regional variations we create quadrants, Northwest (NW), Southwest (SW), Northeast (NE) and Southeast (SE) in relation to the midpoint (40, -105) and show the sample distribution and model performance for each region in table \ref{quad}. The table shows the worst \(f_c\) performance in the SE quadrant despite representing this largest fraction of the training data. This is likely due to the large number of aforementioned prescribed burns in that area. If the goal of the dataset is to be used to train a model to detect and monitor large wildfires, a weakness in the dataset would be that it likely consists of a lot more small, controlled agricultural burns that aren't representative of the intended task. 
 
@@ -174,50 +210,10 @@ In order to observe geographical regional variations we create quadrants, Northw
 \end{table}
 
 
-\begin{figure}[!htb]
-    \parbox{\textwidth}{
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_per_yr_percentages.png}
-        \caption{Annual sample counts in the SmokeViz dataset, broken down by smoke density class. Percentages within each column indicate the relative frequency of each density level for that year.}
-        \label{count_per_yr}
-      }
-    \hspace{0.01\textwidth}
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_percent_country.png}
-        \caption{Proportion of samples in the SmokeViz dataset whose center pixel falls within Canada, the U.S.A., or Mexico. Sample counts are: Canada: 18,461; U.S.: 115,311; Mexico: 25,014. An additional 24,886 samples are centered over other countries or oceans.}
-        \label{count_per_country}
-      }
-    }
-\end{figure}
-
-Figures \ref{count_per_yr} and \ref{count_per_country} present descriptive statistics on the composition of the SmokeViz dataset. 
-
-Importantly, SmokeViz includes annotations across North America, Figure \ref{count_per_country} summarizes the dataset's geographic coverage by country, including the United States, Canada, and Mexico.
-
-\begin{figure}[!htb]
-    \parbox{\textwidth}{
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_frames.png}
-        \caption{The number of annotations that span a number of satellite frames that are generated at a 10-minute interval.}
-        \label{num_frames}
-      }
-    \hspace{0.01\textwidth}
-      \parbox{0.49\textwidth}{
-        \centering
-        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_diff_frames.png}
-        \caption{The number of satellite frame difference between the \(\mathcal{D}_M\) satellite image and \(\mathcal{D}_p\) chosen satellite image. GOES Full disk images are generated on 10 minute intervals. The number of samples that use the same satellite image in both datasets was 36,608 (\(\approx\)20\%).}
-        \label{frame_diff}
-      }
-    }
-\end{figure}
 
 
-\subsection{Additional Model Performance Analysis}
+\subsection{Satellite Analysis}
 
-In order to get a better understanding of the dataset, we use the deep learning models to analyze certain data characteristics. 
 
 We report on how many samples come from each satellite in Figure \ref{sat_dataset}, along with the \(\mathcal{D}_p\) test set IoU. While GOES-EAST provides over triple the number of training samples, \(f_c\) performs better on GOES-WEST samples out of the test set. The signal observed by a single satellite vary diurnally and annually in the amount of atmospheric noise and solar radiation. In turn, if provided with enough samples, this could create a more robust and generalizable model to the extent of being able to perform well on two different sensors with varying calibrations and line of sights. Note that on June 18, 2022, GOES-West switch from operational satellite GOES-17 to the new satellelite GOES-18 satellite. The overall IoU from GOES-17 to GOES-18 is 0.6262 to 0.5852. Training data from 2018-2021 used GOES-17 only training data from 2024 includes GOES-18, so it makes sense that GOES-18 would perform worse than GOES-17. 
 
@@ -228,7 +224,9 @@ We report on how many samples come from each satellite in Figure \ref{sat_datase
     \label{sat_dataset}
 \end{figure}
 
-As mentioned in the limitations, there may have been a bias introduced towards correctly classifying imagery close to sunrise or sunset. This bias may not only be introduced by our Mie-derived dataset that was used to train \(f_{\circ}\), but also in the original HMS annotations. The configuration of the sun, smoke and satellite give the highest signal-to-noise ratio at the times near the sunrise and sunset, making smoke more easily observable. In contrast, the diurnal variations of wildfires cause the fire radiative power to be highest around solar noon \cite{diurnal}. Table \ref{two_hr_iou} shows how the IoU between \(f_c\) predictions and analyst annotations for the test data from either \(\mathcal{D}_M\) or \(\mathcal{D}_p\) vary based on proximity to sunset/sunrise. One explanation for better values for midday samples could be due to higher amounts of fire activity midday and higher amounts of atmospheric interaction noise early/late in the day. Another difference we see from table \ref{two_hr_iou} is the split of closer to daylight boundaries is shifted towards midday between \(\mathcal{D}_M\) to \(\mathcal{D}_p\). This is because, for \(\mathcal{D}_p\), we are choosing the imagery with the best overlap to the analyst product rather than the image from \(\mathcal{D}_M\) that optimized for highest possible signal-to-noise ratio if given constant signal.
+\subsection{Sunset/Sunrise Bias}
+
+As mentioned in the limitations, there may have been a bias introduced towards correctly classifying imagery close to sunrise or sunset. This bias may not only be introduced by our Mie-derived dataset that was used to train \(f_{\circ}\), but also in the original HMS annotations. The configuration of the sun, smoke and satellite give the highest signal-to-noise ratio at the times near the sunrise and sunset, making smoke more easily observable by analysts. In contrast, the diurnal variations of wildfires cause the fire radiative power to be highest around solar noon \cite{diurnal}. Table \ref{two_hr_iou} shows how the IoU between \(f_c\) predictions and analyst annotations for the test data from either \(\mathcal{D}_M\) or \(\mathcal{D}_p\) vary based on proximity to sunset/sunrise. One explanation for better values for midday samples could be due to higher amounts of fire activity midday and higher amounts of atmospheric interaction noise early/late in the day. Another difference we see from table \ref{two_hr_iou} is the split of closer to daylight boundaries is shifted towards midday between \(\mathcal{D}_M\) to \(\mathcal{D}_p\). This is because, for \(\mathcal{D}_p\), we are choosing the imagery with the best overlap to the analyst product rather than the image from \(\mathcal{D}_M\) that optimized for highest possible signal-to-noise ratio if given constant signal.
 
 \begin{figure}[!htb]
     \centering
@@ -236,6 +234,15 @@ As mentioned in the limitations, there may have been a bias introduced towards c
     \caption{Mie Derived dataset vs SmokeViz test sets with IoU}
     \label{DM_vs_DP}
 \end{figure}
+
+\begin{figure}[!htb]
+    \centering
+        \includegraphics[width=0.49\textwidth]{stat_figs/sample_count_vs_diff_frames.png}
+        \caption{The number of satellite frame difference between the \(\mathcal{D}_M\) satellite image and \(\mathcal{D}_p\) chosen satellite image. GOES Full disk images are generated on 10 minute intervals. The number of samples that use the same satellite image in both datasets was 36,608 (\(\approx\)20\%).}
+        \label{frame_diff}
+\end{figure}
+
+
 
 \subsection{Qualitative Analysis on Performance}
 
